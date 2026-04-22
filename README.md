@@ -1,1 +1,1 @@
-# pharma-sales-manager
+# pharma-manager
