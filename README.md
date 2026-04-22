@@ -1,2 +1,1 @@
 # pharma-manager
-rrrr
