@@ -7,10 +7,9 @@ interface RepFabMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onNewVisit: () => void;
-  onScheduleReturn: () => void;
 }
 
-export function RepFabMenu({ isOpen, onClose, onNewVisit, onScheduleReturn }: RepFabMenuProps) {
+export function RepFabMenu({ isOpen, onClose, onNewVisit }: RepFabMenuProps) {
   return (
     <Modal
       visible={isOpen}
@@ -43,21 +42,6 @@ export function RepFabMenu({ isOpen, onClose, onNewVisit, onScheduleReturn }: Re
               <Text style={styles.menuItemSub}>Registrar uma nova visita realizada</Text>
             </View>
           </TouchableOpacity>
-
-          {/* Botão: Agendar Retorno */}
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            onPress={onScheduleReturn}
-          >
-            <View style={[styles.iconContainer, { backgroundColor: 'rgba(74, 158, 142, 0.1)' }]}>
-              <Feather name="calendar" size={24} color={colors.secondary} />
-            </View>
-            <View style={styles.textContainer}>
-              <Text style={styles.menuItemTitle}>Agendar Retorno</Text>
-              <Text style={styles.menuItemSub}>Marcar próxima visita com um profissional</Text>
-            </View>
-          </TouchableOpacity>
-
         </Pressable>
       </Pressable>
     </Modal>

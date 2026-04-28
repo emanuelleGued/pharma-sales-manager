@@ -45,7 +45,7 @@ export default function RepLayout() {
           }}
         />
         
-        {/* Botão Central (Atualizado para add-visits e centralizado na barra) */}
+        {/* Botão Central */}
         <Tabs.Screen
           name="add"
           options={{
@@ -93,10 +93,6 @@ export default function RepLayout() {
         onNewVisit={() => {
           setIsFabOpen(false);
           router.push('/(rep)/new-visit');
-        }}
-        onScheduleReturn={() => {
-          setIsFabOpen(false);
-          router.push('/(rep)/schedule-return');
         }}
       />
     </>
