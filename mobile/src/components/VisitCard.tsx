@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors } from '../src/theme/colors';
+import { colors } from '../theme/colors';
 
 interface VisitCardProps {
   time: string;

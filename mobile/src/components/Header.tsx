@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'; 
-import { colors } from '../src/theme/colors';
+import { colors } from '../theme/colors';
 
 interface HeaderProps {
   onProfileClick: () => void;

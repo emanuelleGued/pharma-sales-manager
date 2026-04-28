@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { View, StyleSheet, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../src/theme/colors';
-import { RepFabMenu } from '../../components/RepFabMenu';
+import { RepFabMenu } from '../../src/components/RepFabMenu';
 
 export default function RepLayout() {
   const [isFabOpen, setIsFabOpen] = useState(false);
