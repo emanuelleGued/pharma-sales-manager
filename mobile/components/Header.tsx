@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Importante!
+import { useSafeAreaInsets } from 'react-native-safe-area-context'; 
 import { colors } from '../src/theme/colors';
 
 interface HeaderProps {
@@ -10,7 +10,6 @@ interface HeaderProps {
 }
 
 export function Header({ onProfileClick, onNotificationsClick }: HeaderProps) {
-  // Isso pega o tamanho da barra de status do seu celular
   const insets = useSafeAreaInsets(); 
 
   return (

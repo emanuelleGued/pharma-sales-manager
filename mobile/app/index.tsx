@@ -1,19 +1,16 @@
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FontAwesome, Feather } from '@expo/vector-icons';
-import { colors } from '../src/theme/colors'; // Usando as cores que já criamos!
+import { colors } from '../src/theme/colors'; 
 
 export default function LandingScreen() {
   const router = useRouter();
 
   const handleLogin = () => {
-    // Usamos replace ao invés de push para que o usuário não consiga 
-    // "voltar" para a tela de login pelo botão de voltar do celular
     router.replace('/(rep)'); 
   };
 
   const handleRegister = () => {
-    // Aqui no futuro você enviará para a tela de criar conta
     console.log('Ir para criação de conta');
   };
 
@@ -61,7 +58,7 @@ export default function LandingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background, // Fundo branco
+    backgroundColor: colors.background, 
   },
   content: {
     flex: 1,
@@ -70,14 +67,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   logoBox: {
-    backgroundColor: colors.primary, // Vermelho BioFarma
+    backgroundColor: colors.primary, 
     width: 120,
     height: 120,
-    borderRadius: 30, // Bordas arredondadas como no design
+    borderRadius: 30, 
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 40,
-    // Sombrinha leve
     shadowColor: colors.primary,
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -91,7 +87,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   titleHighlight: {
-    color: colors.primary, // "BioFarma" em vermelho
+    color: colors.primary, 
   },
   subtitle: {
     fontSize: 16,
@@ -102,7 +98,7 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 24,
     paddingBottom: 40,
-    gap: 16, // Espaçamento entre os botões
+    gap: 16,
   },
   primaryButton: {
     backgroundColor: colors.primary,

@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
-    paddingBottom: 40, // Espaço extra para o home bar do iPhone
+    paddingBottom: 40, 
   },
   header: {
     flexDirection: 'row',

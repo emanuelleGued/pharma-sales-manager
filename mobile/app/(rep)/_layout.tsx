@@ -49,7 +49,7 @@ export default function RepLayout() {
         <Tabs.Screen
           name="add"
           options={{
-            title: '', // Sem título para alinhar perfeitamente com os outros itens
+            title: '', 
             tabBarIcon: () => (
               <View style={styles.fabButton}>
                 <Feather name="plus" size={32} color={colors.background} />
@@ -106,12 +106,11 @@ export default function RepLayout() {
 const styles = StyleSheet.create({
   fabButton: {
     backgroundColor: colors.primary,
-    width: 56, // Tamanho ligeiramente ajustado para caber perfeito na barra
+    width: 56,
     height: 56,
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    // Removemos a posição absoluta e o top negativo para ele seguir o fluxo padrão
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

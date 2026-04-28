@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 5,
-    elevation: 2, // Sombra leve para Android
+    elevation: 2, 
   },
   timeContainer: {
     alignItems: 'center',
