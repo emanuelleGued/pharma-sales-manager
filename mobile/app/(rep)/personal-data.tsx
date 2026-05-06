@@ -15,10 +15,11 @@ export default function PersonalDataScreen() {
   });
 
   const handleSave = () => {
-    Alert.alert("Sucesso", "Seus dados foram atualizados!", [
-      { text: "OK", onPress: () => router.navigate('/(rep)/profile') } 
-    ]);
-  };
+  router.replace({
+    pathname: '/(rep)/profile',
+    params: { success: 'profile_updated' }
+  });
+};
 
   return (
     <SafeAreaView style={styles.container}>
