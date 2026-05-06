@@ -11,12 +11,17 @@ export default function RepHomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { visits } = useVisits();
+  const todayString = new Intl.DateTimeFormat('pt-BR').format(new Date());
+  const todayVisits = visits.filter(v => v.date === todayString);
+
+  const completedToday = todayVisits.filter(v => v.status === 'completed').length;
+  const progressPercent = (completedToday / 10) * 100;
   
   const [showToast, setShowToast] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (params.success === 'true') {
+    if (params.success) { 
       setShowToast(true);
       
       Animated.timing(fadeAnim, {
@@ -70,12 +75,12 @@ export default function RepHomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Roteiro de Hoje</Text>
           
-          {visits.length === 0 ? (
+          {todayVisits.length === 0 ? (
             <Text style={styles.emptyText}>
               Nenhuma visita registrada ainda. Vá na tela de adicionar para começar!
             </Text>
           ) : (
-            visits.map((visit) => (
+            todayVisits.map((visit) => (
               <VisitCard
                 key={visit.id}
                 time={visit.time}

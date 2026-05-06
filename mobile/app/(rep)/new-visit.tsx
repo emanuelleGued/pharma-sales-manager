@@ -9,6 +9,7 @@ import {
   ScrollView, 
   Modal,
   FlatList,
+  Alert,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -16,7 +17,6 @@ import { colors } from '../../src/theme/colors';
 import { MOCK_DOCTORS, Doctor } from '../../src/mocks/doctors';
 import { useVisits } from '../../src/context/VisitContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Platform } from 'react-native';
 
 export default function NewVisitScreen() {
   const router = useRouter();
@@ -36,27 +36,8 @@ export default function NewVisitScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  const handleDateChange = (text: string) => {
-    const cleaned = text.replace(/\D/g, ''); 
-      let formatted = cleaned;
-      if (cleaned.length > 2) formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
-      if (cleaned.length > 4) formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4, 8)}`;
-      setVisitDate(formatted);
-  };
-
-  const handleTimeChange = (text: string) => {
-    const cleaned = text.replace(/\D/g, '');
-    let formatted = cleaned;
-    if (cleaned.length > 2) formatted = `${cleaned.slice(0, 2)}:${cleaned.slice(2, 4)}`;
-    setVisitTime(formatted); 
-  };
-
   const formatDate = (date: Date) => {
     return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-  };
-
-  const formatTime = (date: Date) => {
-    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
 
   const onDateChange = (event: any, selectedDate?: Date) => {
@@ -95,8 +76,10 @@ export default function NewVisitScreen() {
 
       router.replace({
         pathname: '/(rep)',
-        params: { success: 'true' }
+        params: { success: Date.now().toString() } 
       });
+    } else {
+      Alert.alert("Erro", "Por favor, preencha Médico, Data e Hora.");
     }
   };
 
