@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { VisitCard } from '../../src/components/VisitCard'; 
+import VisitCard from '../../src/components/VisitCard'; 
 import { Header } from '../../src/components/Header'; 
 import { colors } from '../../src/theme/colors';
 import { useRouter } from 'expo-router';

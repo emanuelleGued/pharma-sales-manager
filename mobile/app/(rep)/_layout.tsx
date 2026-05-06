@@ -38,7 +38,7 @@ export default function RepLayout() {
         />
         
         <Tabs.Screen
-          name="calendar"
+          name="schedule"
           options={{ 
             title: 'Agenda', 
             tabBarIcon: ({ color }) => <Feather name="calendar" size={24} color={color} /> 

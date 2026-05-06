@@ -11,7 +11,7 @@ interface VisitCardProps {
   onPress?: () => void;
 }
 
-export function VisitCard({ time, doctorName, specialty, clinic, onPress }: VisitCardProps) {
+export default function VisitCard({ time, doctorName, specialty, clinic, onPress }: VisitCardProps) {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.timeContainer}>
