@@ -3,13 +3,17 @@ import { VisitCard } from '../../src/components/VisitCard';
 import { Header } from '../../src/components/Header'; 
 import { colors } from '../../src/theme/colors';
 import { useRouter } from 'expo-router';
+import { useVisits } from '../../src/context/VisitContext'; 
 
 export default function RepHomeScreen() {
   const router = useRouter();
-  const visits = [
-    { id: '1', time: '10:00', name: 'Dr. Marcos', spec: 'Cardiologista', clinic: 'Clínica Coração Saudável' },
-    { id: '2', time: '14:30', name: 'Dra. Ana Paula', spec: 'Pediatra', clinic: 'Centro Pediátrico ABC' },
-  ];
+  
+  // Substituímos o array fixo pelas visitas que vêm do Contexto!
+  const { visits } = useVisits();
+  const todayString = new Intl.DateTimeFormat('pt-BR').format(new Date());
+  const todayVisits = visits.filter(v => v.date === todayString);
+  const completedToday = todayVisits.filter(v => v.status === 'completed').length;
+  const progressPercent = (completedToday / 10) * 100;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -30,15 +34,24 @@ export default function RepHomeScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Roteiro de Hoje</Text>
-          {visits.map((visit) => (
-            <VisitCard
-              key={visit.id}
-              time={visit.time}
-              doctorName={visit.name}
-              specialty={visit.spec}
-              clinic={visit.clinic}
-            />
-          ))}
+          
+          {/* Se não houver visitas, mostra um textinho amigável */}
+          {visits.length === 0 ? (
+            <Text style={styles.emptyText}>
+              Nenhuma visita registrada ainda. Vá na tela de adicionar para começar!
+            </Text>
+          ) : (
+            /* Se houver, mapeia as visitas do Contexto para o seu VisitCard */
+            visits.map((visit) => (
+              <VisitCard
+                key={visit.id}
+                time={visit.time}
+                doctorName={visit.doctor.name}       // Puxando de visit.doctor
+                specialty={visit.doctor.specialty}   // Puxando de visit.doctor
+                clinic={visit.doctor.clinicName}     // Puxando de visit.doctor
+              />
+            ))
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -87,4 +100,10 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 16,
   },
+  emptyText: {
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+  }
 });
