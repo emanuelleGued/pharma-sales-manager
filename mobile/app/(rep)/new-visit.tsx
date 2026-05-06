@@ -9,13 +9,14 @@ import {
   ScrollView, 
   Modal,
   FlatList,
-  Alert
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import { MOCK_DOCTORS, Doctor } from '../../src/mocks/doctors';
 import { useVisits } from '../../src/context/VisitContext';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Platform } from 'react-native';
 
 export default function NewVisitScreen() {
   const router = useRouter();
@@ -30,6 +31,10 @@ export default function NewVisitScreen() {
   
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
+
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const handleDateChange = (text: string) => {
     const cleaned = text.replace(/\D/g, ''); 
@@ -46,44 +51,70 @@ export default function NewVisitScreen() {
     setVisitTime(formatted); 
   };
 
-  const isFormValid = selectedDoctor && visitDate && visitTime;
+  const formatDate = (date: Date) => {
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+  };
 
-  const handleSubmit = () => {
-    if (isFormValid) {
-      if (!isEditMode && selectedDoctor) {
-        addVisit({
-          doctor: selectedDoctor,
-          date: visitDate,
-          time: visitTime,
-          observations: observations
-        });
-      }
+  const formatTime = (date: Date) => {
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
 
-      Alert.alert(
-        "Sucesso!", 
-        isEditMode ? "Visita atualizada." : "Visita registrada com sucesso.",
-        [{ text: "OK", onPress: () => router.navigate('/(rep)') }]
-      );
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false); 
+    if (selectedDate) {
+      setDate(selectedDate);
+      setVisitDate(formatDate(selectedDate));
     }
   };
 
-  // Renderiza cada médico na lista do Modal
+  const onTimeChange = (event: any, selectedTime?: Date) => {
+    setShowTimePicker(false); 
+    if (selectedTime) {
+      const hours = selectedTime.getHours().toString().padStart(2, '0');
+      const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+      setVisitTime(`${hours}:${minutes}`);
+    }
+  };
+
+
+  const isFormValid = selectedDoctor && visitDate && visitTime;
+
+  const handleSubmit = () => {
+    if (selectedDoctor && visitDate && visitTime) {
+      addVisit({
+        doctor: selectedDoctor,
+        date: visitDate,
+        time: visitTime,
+        observations: observations
+      });
+
+      setSelectedDoctor(null);
+      setVisitDate('');
+      setVisitTime('');
+      setObservations('');
+
+      router.replace({
+        pathname: '/(rep)',
+        params: { success: 'true' }
+      });
+    }
+  };
+
   const renderDoctorItem = ({ item }: { item: Doctor }) => (
     <TouchableOpacity 
-      style={styles.doctorListItem}
+      style={styles.doctorCard} 
       onPress={() => {
         setSelectedDoctor(item);
         setIsDoctorModalOpen(false);
       }}
     >
-      <View style={styles.doctorAvatar}>
-        <Text style={styles.doctorAvatarText}>{item.name.charAt(0)}</Text>
+      <View style={styles.doctorIconCircle}>
+        <Feather name="user" size={20} color="#00A896" />
       </View>
-      <View style={styles.doctorInfo}>
-        <Text style={styles.doctorName}>{item.name}</Text>
-        <Text style={styles.doctorSpecialty}>{item.specialty} • {item.clinicName}</Text>
+      <View style={styles.doctorDetails}>
+        <Text style={styles.doctorNameText}>{item.name}</Text>
+        <Text style={styles.doctorSpecialtyText}>{item.specialty}</Text>
       </View>
-      <Feather name="chevron-right" size={20} color={colors.textSecondary} />
     </TouchableOpacity>
   );
 
@@ -127,47 +158,58 @@ export default function NewVisitScreen() {
             {/* Data da Visita */}
             <View style={[styles.inputGroup, { flex: 1 }]}>
               <Text style={styles.label}>DATA</Text>
-              <View style={[
-                styles.inputContainer,
-                focusedField === 'date' && styles.inputContainerFocused
-              ]}>
+              <TouchableOpacity 
+                activeOpacity={0.7}
+                onPress={() => {
+                  console.log("Abrindo Data..."); 
+                  setShowDatePicker(true);
+                }}
+                style={styles.inputContainer}
+              >
                 <Feather name="calendar" size={20} color="#00A896" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  value={visitDate}
-                  onChangeText={handleDateChange}
-                  onFocus={() => setFocusedField('date')}
-                  onBlur={() => setFocusedField(null)}
-                  placeholder="DD/MM/AAAA"
-                  placeholderTextColor={colors.textSecondary}
-                  keyboardType="numeric"
-                  maxLength={10}
-                />
-              </View>
+                <Text style={visitDate ? styles.inputText : styles.placeholderText}>
+                  {visitDate || 'Selecionar...'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             {/* Horário da Visita */}
             <View style={[styles.inputGroup, { flex: 1 }]}>
               <Text style={styles.label}>HORÁRIO</Text>
-              <View style={[
-                styles.inputContainer,
-                focusedField === 'time' && styles.inputContainerFocused
-              ]}>
+              <TouchableOpacity 
+                activeOpacity={0.7}
+                onPress={() => {
+                  console.log("Abrindo Hora..."); 
+                  setShowTimePicker(true);
+                }}
+                style={styles.inputContainer}
+              >
                 <Feather name="clock" size={20} color="#00A896" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  value={visitTime}
-                  onChangeText={handleTimeChange}
-                  onFocus={() => setFocusedField('time')}
-                  onBlur={() => setFocusedField(null)}
-                  placeholder="HH:MM"
-                  placeholderTextColor={colors.textSecondary}
-                  keyboardType="numeric"
-                  maxLength={5}
-                />
-              </View>
+                <Text style={visitTime ? styles.inputText : styles.placeholderText}>
+                  {visitTime || 'Selecionar...'}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={date || new Date()}
+              mode="date"
+              display="default"
+              onChange={onDateChange}
+            />
+          )}
+
+          {showTimePicker && (
+            <DateTimePicker
+              value={date || new Date()}
+              mode="time"
+              is24Hour={true}
+              display="spinner"
+              onChange={onTimeChange}
+            />
+          )}
         </View>
 
         {/* Card: Observações */}
@@ -193,7 +235,7 @@ export default function NewVisitScreen() {
           </View>
         </View>
 
-        {/* Botão Salvar (Estilo Outline conforme web) */}
+        {/* Botão Salvar */}
         <TouchableOpacity 
           style={[
             styles.submitButton,
@@ -212,7 +254,7 @@ export default function NewVisitScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Modal de Seleção de Médico (Bottom Sheet Style) */}
+      {/* Modal de Seleção de Médico */}
       <Modal
         visible={isDoctorModalOpen}
         animationType="slide"
@@ -392,69 +434,64 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
   
-  // Estilos do Modal (Bottom Sheet)
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    minHeight: '50%',
+    backgroundColor: '#F8F9FA', 
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingHorizontal: 24,
+    paddingTop: 12,
     maxHeight: '80%',
-    padding: 24,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    paddingVertical: 20,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: colors.text,
+    color: '#1A1C1E',
   },
   modalList: {
     paddingBottom: 24,
   },
-  doctorListItem: {
+  doctorCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
   },
-  doctorAvatar: {
+  doctorIconCircle: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    backgroundColor: '#FEE2E2',
+    borderRadius: 12,
+    backgroundColor: '#E6F6F4',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
   },
-  doctorAvatarText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#C8102E',
-  },
-  doctorInfo: {
+  doctorDetails: {
     flex: 1,
   },
-  doctorName: {
+  doctorNameText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 4,
+    fontWeight: '700',
+    color: '#1A1C1E',
   },
-  doctorSpecialty: {
+  doctorSpecialtyText: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: '#00A896',
+    fontWeight: '600',
+    marginTop: 2,
   },
 });
