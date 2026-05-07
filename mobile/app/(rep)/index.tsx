@@ -93,7 +93,7 @@ export default function RepHomeScreen() {
                   specialty={doctor?.specialty || ''}
                   clinic={doctor?.clinicName || ''}
                   onPress={() => router.push({ 
-                    pathname: '/(rep)/schedule-details', 
+                    pathname: '/(rep)/visit-details', 
                     params: { id: visit.id } 
                   })}
                   onEdit={() => router.push({ pathname: '/(rep)/edit-visit', params: { id: visit.id } })}
