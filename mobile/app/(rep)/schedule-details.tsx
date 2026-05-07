@@ -15,6 +15,8 @@ export default function ScheduleDetailsScreen() {
 
   if (!visit || !doctor) return null;
 
+  const displayDate = visit.date.split('-').reverse().join('/');
+
   const handleDelete = () => {
     Alert.alert('Excluir visita', 'Tem certeza que deseja remover este agendamento?', [
       { text: 'Cancelar', style: 'cancel' },
@@ -74,7 +76,7 @@ export default function ScheduleDetailsScreen() {
             </View>
             <View style={{ marginLeft: 12, flex: 1 }}>
               <Text style={styles.label}>HORÁRIO</Text>
-              <Text style={styles.value}>{visit.time}</Text>
+              <Text style={styles.value}>{displayDate}</Text>
             </View>
           </View>
         </View>

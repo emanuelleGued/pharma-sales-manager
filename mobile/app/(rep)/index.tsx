@@ -12,7 +12,7 @@ export default function RepHomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { visits, deleteVisit } = useVisits();
-  const todayString = new Intl.DateTimeFormat('pt-BR').format(new Date());
+  const todayString = new Date().toISOString().split('T')[0];
   const todayVisits = visits.filter(v => v.date === todayString);
 
   const completedToday = todayVisits.filter(v => v.status === 'completed').length;

@@ -14,7 +14,7 @@ import VisitCard from '../../src/components/VisitCard';
 import { MOCK_DOCTORS } from '../../src/mocks/docktors';
 import { useVisits } from '../../src/context/VisitContext'; 
 
-export default function AgendaScreen() {
+export default function ScheduleScreen() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split('T')[0]
