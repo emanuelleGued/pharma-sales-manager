@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, Animated, Alert } from 'react-native';
 import VisitCard from '../../src/components/VisitCard'; 
 import { Header } from '../../src/components/Header'; 
 import { colors } from '../../src/theme/colors';
@@ -11,7 +11,7 @@ import { MOCK_DOCTORS } from '@/src/mocks/docktors';
 export default function RepHomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { visits } = useVisits();
+  const { visits, deleteVisit } = useVisits();
   const todayString = new Intl.DateTimeFormat('pt-BR').format(new Date());
   const todayVisits = visits.filter(v => v.date === todayString);
 
@@ -21,6 +21,7 @@ export default function RepHomeScreen() {
   const [showToast, setShowToast] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const toastMessage = (params.toastMessage as string) || 'Visita registrada com sucesso!';
+  
 
   useEffect(() => {
     if (params.success) { 
@@ -95,6 +96,13 @@ export default function RepHomeScreen() {
                     pathname: '/(rep)/schedule-details', 
                     params: { id: visit.id } 
                   })}
+                  onEdit={() => router.push({ pathname: '/(rep)/edit-visit', params: { id: visit.id } })}
+                  onDelete={() => {
+                    Alert.alert("Excluir", "Deseja excluir esta visita?", [
+                      { text: "Não" },
+                      { text: "Sim", onPress: () => deleteVisit(visit.id) }
+                    ]);
+                  }}
                 />
               );
             }) 

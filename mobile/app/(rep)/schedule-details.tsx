@@ -1,11 +1,11 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { View, Text, TouchableOpacity, Alert, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
 import { useVisits } from '../../src/context/VisitContext';
 import { MOCK_DOCTORS } from '../../src/mocks/docktors';
 
-export default function VisitDetailScreen() {
+export default function ScheduleDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { visits = [], deleteVisit } = useVisits();
   const router = useRouter();
@@ -16,74 +16,88 @@ export default function VisitDetailScreen() {
   if (!visit || !doctor) return null;
 
   const handleDelete = () => {
-    Alert.alert('Excluir visita', 'Tem certeza?', [
+    Alert.alert('Excluir visita', 'Tem certeza que deseja remover este agendamento?', [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Excluir',
         style: 'destructive',
-        onPress: () => { deleteVisit(visit.id); router.push('/(rep)/schedule'); },
+        onPress: () => { 
+          deleteVisit(visit.id); 
+          router.replace('/(rep)/schedule'); 
+        },
       },
     ]);
   };
 
-  const formattedDate = new Date(visit.date + 'T00:00:00').toLocaleDateString('pt-BR', {
+  const formattedDate = new Date(visit.date + 'T12:00:00').toLocaleDateString('pt-BR', {
     day: 'numeric', month: 'long', year: 'numeric',
   });
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push('/(rep)/schedule')}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Feather name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalhes da Visita</Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 40 }} /> 
       </View>
 
-      {/* Médico */}
-      <View style={styles.card}>
-        <Text style={styles.doctorName}>{doctor.name}</Text>
-        <Text style={styles.specialty}>{doctor.specialty}</Text>
-        <View style={styles.divider} />
-        <View style={styles.row}>
-          <Feather name="map-pin" size={16} color={colors.secondary} />
-          <View style={{ marginLeft: 8 }}>
-            <Text style={styles.clinicName}>{doctor.clinicName}</Text>
-            <Text style={styles.location}>{doctor.location}</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Card do Médico */}
+        <View style={styles.card}>
+          <Text style={styles.doctorName}>{doctor.name}</Text>
+          <Text style={styles.specialty}>{doctor.specialty}</Text>
+          <View style={styles.divider} />
+          <View style={styles.row}>
+            <Feather name="map-pin" size={16} color={colors.secondary} />
+            <View style={{ marginLeft: 8 }}>
+              <Text style={styles.clinicName}>{doctor.clinicName}</Text>
+              <Text style={styles.location}>{doctor.location}</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Data & Horário */}
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Data & Horário</Text>
-        <View style={styles.row}>
-          <View style={styles.iconCircle}>
-            <Feather name="calendar" size={18} color={colors.secondary} />
-          </View>
-          <View style={{ marginLeft: 8, marginRight: 24 }}>
-            <Text style={styles.label}>Data</Text>
-            <Text style={styles.value}>{formattedDate}</Text>
-          </View>
-          <View style={styles.iconCircle}>
-            <Feather name="clock" size={18} color={colors.secondary} />
-          </View>
-          <View style={{ marginLeft: 8 }}>
-            <Text style={styles.label}>Horário</Text>
-            <Text style={styles.value}>{visit.time}</Text>
+        {/* Card de Data/Hora */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Data & Horário</Text>
+          <View style={styles.row}>
+            <View style={styles.iconCircle}>
+              <Feather name="calendar" size={18} color={colors.secondary} />
+            </View>
+            <View style={{ marginLeft: 12, flex: 1 }}>
+              <Text style={styles.label}>DATA</Text>
+              <Text style={styles.value}>{formattedDate}</Text>
+            </View>
+            <View style={styles.iconCircle}>
+              <Feather name="clock" size={18} color={colors.secondary} />
+            </View>
+            <View style={{ marginLeft: 12, flex: 1 }}>
+              <Text style={styles.label}>HORÁRIO</Text>
+              <Text style={styles.value}>{visit.time}</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Ações */}
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={() => router.push({ pathname: '/(rep)/edit-visit', params: { id: visit.id } })}>
-          <Text style={styles.editText}>Editar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleDelete}>
-          <Text style={styles.deleteText}>Excluir</Text>
-        </TouchableOpacity>
-      </View>
+        {/* Botões de Ação Padronizados com Bordas */}
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity 
+            style={styles.outlineButton} 
+            onPress={() => router.push({ pathname: '/(rep)/edit-visit', params: { id: visit.id } })}
+          >
+            <Feather name="edit-2" size={18} color={colors.secondary} />
+            <Text style={styles.outlineButtonText}>Editar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.outlineButton, { borderColor: '#E74C3C' }]} 
+            onPress={handleDelete}
+          >
+            <Feather name="trash-2" size={18} color="#E74C3C" />
+            <Text style={[styles.outlineButtonText, { color: '#E74C3C' }]}>Excluir</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -91,27 +105,60 @@ export default function VisitDetailScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
-    flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'space-between', padding: 16,
-    borderBottomWidth: 1, borderColor: colors.border,
+    flexDirection: 'row', 
+    alignItems: 'center',
+    justifyContent: 'space-between', 
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1, 
+    borderColor: colors.border,
   },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: colors.text },
+  backButton: {
+    padding: 8,
+    backgroundColor: colors.surface,
+    borderRadius: 50,
+  },
+  headerTitle: { fontSize: 20, fontWeight: '800', color: colors.text },
+  scrollContent: { padding: 20, paddingBottom: 40 },
   card: {
-    margin: 16, marginBottom: 0, padding: 16,
-    backgroundColor: '#fff', borderRadius: 16,
-    borderWidth: 1, borderColor: colors.border,
+    padding: 20,
+    backgroundColor: '#fff', 
+    borderRadius: 16,
+    borderWidth: 1, 
+    borderColor: colors.border,
+    marginBottom: 16,
   },
-  doctorName: { fontSize: 18, fontWeight: 'bold', color: colors.text },
-  specialty: { fontSize: 14, color: colors.secondary, marginTop: 2 },
-  divider: { height: 1, backgroundColor: colors.border, marginVertical: 12 },
+  doctorName: { fontSize: 20, fontWeight: 'bold', color: colors.text },
+  specialty: { fontSize: 15, color: colors.textSecondary, marginTop: 4 },
+  divider: { height: 1, backgroundColor: colors.border, marginVertical: 16 },
   row: { flexDirection: 'row', alignItems: 'center' },
-  clinicName: { fontSize: 15, fontWeight: '600', color: colors.text },
-  location: { fontSize: 13, color: colors.textSecondary },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: colors.text, marginBottom: 12 },
-  iconCircle: { backgroundColor: colors.successBackground, padding: 10, borderRadius: 50 },
-  label: { fontSize: 11, color: colors.textSecondary },
-  value: { fontSize: 14, fontWeight: 'bold', color: colors.text, marginTop: 2 },
-  actions: { flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 32 },
-  editText: { fontSize: 16, fontWeight: 'bold', color: colors.secondary },
-  deleteText: { fontSize: 16, fontWeight: 'bold', color: colors.primary },
+  clinicName: { fontSize: 16, fontWeight: '600', color: colors.text },
+  location: { fontSize: 14, color: colors.textSecondary },
+  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: colors.text, marginBottom: 16 },
+  iconCircle: { backgroundColor: '#F0F9F7', padding: 10, borderRadius: 12 },
+  label: { fontSize: 11, color: colors.textSecondary, letterSpacing: 1 },
+  value: { fontSize: 15, fontWeight: 'bold', color: colors.text, marginTop: 2 },
+  
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  outlineButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: colors.secondary,
+    flex: 0.48, 
+    backgroundColor: '#fff',
+  },
+  outlineButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.secondary,
+    marginLeft: 8,
+  },
 });

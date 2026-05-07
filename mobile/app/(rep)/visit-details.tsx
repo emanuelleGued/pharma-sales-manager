@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 120, // increased padding to clear the absolute tab bar
+    paddingBottom: 120, 
   },
   doctorCard: {
     flexDirection: 'row',

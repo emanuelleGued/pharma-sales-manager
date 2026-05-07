@@ -334,9 +334,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
     color: colors.text 
   },
-  content: { 
-    padding: 24,
-    gap: 20,
+  content: {
+    paddingHorizontal: 20, 
+    paddingBottom: 120, 
+    gap: 16, 
   },
   card: {
     backgroundColor: '#FFFFFF',
@@ -422,14 +423,15 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   submitButton: {
-    width: '100%',
-    paddingVertical: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 18,
+  borderWidth: 2,
+  borderRadius: 16,
+  marginTop: 10, 
+  marginBottom: 20,
+},
   submitButtonActive: {
     backgroundColor: 'transparent',
     borderColor: '#C8102E',
@@ -439,10 +441,10 @@ const styles = StyleSheet.create({
     borderColor: '#D1D5DB',
   },
   submitButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-  },
+  color: colors.primary, 
+    fontWeight: 'bold', 
+    fontSize: 16 
+},
   submitButtonTextActive: {
     color: '#C8102E',
   },
