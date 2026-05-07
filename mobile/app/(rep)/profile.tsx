@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert, Animated } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 
 export default function ProfileScreen() {
@@ -9,6 +9,33 @@ export default function ProfileScreen() {
   const userName = "Carlos Silva";
   const userRole = "Gerente Regional";
   const userEmail = "carlos.silva@biofarma.com.br";
+  
+  const params = useLocalSearchParams();
+  const [showToast, setShowToast] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (params.success) {
+      setShowToast(true);
+      
+      Animated.timing(fadeAnim, { 
+        toValue: 1, 
+        duration: 400, 
+        useNativeDriver: true 
+      }).start();
+
+      setTimeout(() => {
+        Animated.timing(fadeAnim, { 
+          toValue: 0, 
+          duration: 400, 
+          useNativeDriver: true 
+        }).start(() => {
+          setShowToast(false);
+          router.setParams({ success: undefined });
+        });
+      }, 3000);
+    }
+  }, [params.success]);
 
   const handleLogout = () => {
     Alert.alert(
@@ -27,6 +54,20 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      
+      {showToast && (
+        <Animated.View style={[styles.toastWrapper, { opacity: fadeAnim }]}>
+          <View style={styles.toast}>
+            <View style={styles.iconCircle}>
+              <Feather name="check" size={14} color="#00A896" />
+            </View>
+            <Text style={styles.toastText}>
+              {params.success === 'password_updated' ? 'Senha atualizada!' : 'Dados salvos com sucesso!'}
+            </Text>
+          </View>
+        </Animated.View>
+      )}
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
@@ -121,6 +162,43 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
+  
+  toastWrapper: {
+    position: 'absolute',
+    top: 100, 
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 9999,
+  },
+  toast: {
+    backgroundColor: '#00A896',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  iconCircle: {
+    backgroundColor: '#FFF',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  toastText: {
+    color: '#FFF',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
