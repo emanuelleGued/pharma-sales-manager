@@ -7,8 +7,8 @@ export interface Visit {
   doctor?: Doctor;  
   date: string;
   time: string;
-  observations?: string;
-  presentedMaterial?: string;
+  observations?: string;      
+  presentedMaterial?: string; 
   status: 'scheduled' | 'completed';
 }
 
