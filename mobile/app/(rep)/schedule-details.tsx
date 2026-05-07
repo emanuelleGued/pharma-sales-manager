@@ -2,15 +2,15 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, Text, TouchableOpacity, Alert, StyleSheet, SafeAreaView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
-import { useVisits } from '../../src/context/VisitsContext';
-import { MOCK_DOCTORS } from '../../src/mocks/doctors';
+import { useVisits } from '../../src/context/VisitContext';
+import { MOCK_DOCTORS } from '../../src/mocks/docktors';
 
 export default function VisitDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { visits, deleteVisit } = useVisits();
+  const { visits = [], deleteVisit } = useVisits();
   const router = useRouter();
 
-  const visit = visits.find((v) => v.id === id);
+  const visit = visits?.find((v) => v.id === id);
   const doctor = MOCK_DOCTORS.find((d) => d.id === visit?.doctorId);
 
   if (!visit || !doctor) return null;
@@ -77,7 +77,7 @@ export default function VisitDetailScreen() {
 
       {/* Ações */}
       <View style={styles.actions}>
-        <TouchableOpacity onPress={() => router.push({ pathname: '/(rep)/edit_visit', params: { id: visit.id } })}>
+        <TouchableOpacity onPress={() => router.push({ pathname: '/(rep)/edit-visit', params: { id: visit.id } })}>
           <Text style={styles.editText}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleDelete}>

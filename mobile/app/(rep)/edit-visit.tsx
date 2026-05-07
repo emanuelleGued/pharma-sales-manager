@@ -6,8 +6,8 @@ import {
 import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
-import { useVisits } from '../../src/context/VisitsContext';
-import { MOCK_DOCTORS } from '../../src/mocks/doctors';
+import { useVisits } from '../../src/context/VisitContext';
+import { MOCK_DOCTORS } from '../../src/mocks/docktors';
 
 export default function EditVisitScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -19,7 +19,7 @@ export default function EditVisitScreen() {
 
   const [date, setDate] = useState(visit?.date || '');
   const [time, setTime] = useState(visit?.time || '');
-  const [notes, setNotes] = useState(visit?.notes || '');
+  const [observations, setObservations] = useState(visit?.observations || '');
 
   if (!visit || !doctor) return null;
 
@@ -29,7 +29,7 @@ export default function EditVisitScreen() {
       return;
     }
 
-    updateVisit({ ...visit, date, time, notes });
+    updateVisit({ ...visit, date, time, observations });
     router.back();
   };
 
@@ -95,8 +95,8 @@ export default function EditVisitScreen() {
             <Feather name="file-text" size={18} color={colors.secondary} style={{ marginTop: 2 }} />
             <TextInput
               style={styles.notesInput}
-              value={notes}
-              onChangeText={setNotes}
+              value={observations}
+              onChangeText={setObservations}
               placeholder="Adicione observações sobre a visita..."
               placeholderTextColor={colors.textSecondary}
               multiline

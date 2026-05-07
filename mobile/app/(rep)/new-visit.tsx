@@ -14,7 +14,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../../src/theme/colors';
-import { MOCK_DOCTORS, Doctor } from '../../mocks/docktors';
+import { MOCK_DOCTORS, Doctor } from '../../src/mocks/docktors';
 import { useVisits } from '../../src/context/VisitContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -63,10 +63,10 @@ export default function NewVisitScreen() {
   const handleSubmit = () => {
     if (selectedDoctor && visitDate && visitTime) {
       addVisit({
-        doctor: selectedDoctor,
+        doctorId: selectedDoctor.id, 
         date: visitDate,
         time: visitTime,
-        observations: observations
+        observations: observations,
       });
 
       setSelectedDoctor(null);

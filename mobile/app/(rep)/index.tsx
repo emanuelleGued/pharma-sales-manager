@@ -6,6 +6,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useVisits } from '../../src/context/VisitContext';
 import { useEffect, useState, useRef } from 'react'; 
 import { Feather } from '@expo/vector-icons'; 
+import { MOCK_DOCTORS } from '@/src/mocks/docktors';
 
 export default function RepHomeScreen() {
   const router = useRouter();
@@ -80,16 +81,23 @@ export default function RepHomeScreen() {
               Nenhuma visita registrada ainda. Vá na tela de adicionar para começar!
             </Text>
           ) : (
-            todayVisits.map((visit) => (
-              <VisitCard
-                key={visit.id}
-                time={visit.time}
-                doctorName={visit.doctor.name}       
-                specialty={visit.doctor.specialty}
-                clinic={visit.doctor.clinicName}
-                onPress={() => router.push('/(rep)/visit_detail')}
-              />
-            ))
+            todayVisits.map((visit) => {
+              const doctor = MOCK_DOCTORS.find((d) => d.id === visit.doctorId);
+
+              return (
+                <VisitCard
+                  key={visit.id}
+                  time={visit.time}
+                  doctorName={doctor?.name || 'Médico não encontrado'}       
+                  specialty={doctor?.specialty || ''}
+                  clinic={doctor?.clinicName || ''}
+                  onPress={() => router.push({ 
+                    pathname: '/(rep)/schedule-details', 
+                    params: { id: visit.id } 
+                  })}
+                />
+              );
+            }) 
           )}
         </View>
       </ScrollView>

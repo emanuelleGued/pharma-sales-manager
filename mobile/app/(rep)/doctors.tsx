@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
-import { MOCK_DOCTORS, Doctor } from '../../mocks/docktors';
+import { MOCK_DOCTORS, Doctor } from '../../src/mocks/docktors';
 
 export default function DoctorsScreen() {
   const [doctors, setDoctors] = useState<Doctor[]>(MOCK_DOCTORS);

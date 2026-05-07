@@ -11,16 +11,16 @@ import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import VisitCard from '../../src/components/VisitCard';
-import { MOCK_DOCTORS } from '@/src/mocks/doctors';
-import { useVisits } from '../../src/context/VisitsContext'; // ← novo
+import { MOCK_DOCTORS } from '../../src/mocks/docktors';
+import { useVisits } from '../../src/context/VisitContext'; 
 
 export default function AgendaScreen() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split('T')[0]
   );
-  const { visits, deleteVisit } = useVisits(); // ← novo (removeu MOCK_VISITS)
-  const router = useRouter(); // ← novo
+  const { visits, deleteVisit } = useVisits(); 
+  const router = useRouter(); 
 
   const getWeekDays = (date: Date) => {
     const start = new Date(date);
@@ -58,12 +58,12 @@ export default function AgendaScreen() {
     setCurrentDate(prev);
   };
 
-  const filteredVisits = visits // ← era MOCK_VISITS
+  const filteredVisits = (visits || [])
     .filter((visit) => visit.date === selectedDate)
     .map((visit) => {
       const doctor = MOCK_DOCTORS.find((doc) => doc.id === visit.doctorId);
       return { ...visit, doctor };
-    });
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -125,8 +125,8 @@ export default function AgendaScreen() {
                 doctorName={doctor?.name || ''}
                 specialty={doctor?.specialty || ''}
                 clinic={doctor?.clinicName || ''}
-                onPress={() => router.push({ pathname: '/(rep)/visit_detail', params: { id } })}
-                onEdit={() => router.push({ pathname: '/(rep)/edit_visit', params: { id } })}
+                onPress={() => router.push({ pathname: '/(rep)/schedule-details', params: { id } })}
+                onEdit={() => router.push({ pathname: '/(rep)/edit-visit', params: { id } })}
                 onDelete={() =>
                   Alert.alert('Excluir visita', 'Tem certeza?', [
                     { text: 'Cancelar', style: 'cancel' },

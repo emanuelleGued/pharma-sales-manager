@@ -5,7 +5,6 @@ import { View, StyleSheet, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../src/theme/colors';
 import { RepFabMenu } from '../../src/components/RepFabMenu';
-import { VisitsProvider } from '../../src/context/VisitsContext';
 
 export default function RepLayout() {
   const [isFabOpen, setIsFabOpen] = useState(false);
@@ -13,8 +12,7 @@ export default function RepLayout() {
   const insets = useSafeAreaInsets();
 
   return (
-    <VisitsProvider>
-      <>
+    <>
         <Tabs
           screenOptions={{
             headerShown: false,
@@ -90,8 +88,9 @@ export default function RepLayout() {
           <Tabs.Screen name="change-password" options={{ href: null }} />
           <Tabs.Screen name="notification-settings" options={{ href: null }} />
           <Tabs.Screen name="personal-data" options={{ href: null }} />
-          <Tabs.Screen name="edit_visit" options={{ href: null }} />
-          <Tabs.Screen name="visit_detail" options={{ href: null }} />
+          <Tabs.Screen name="edit-visit" options={{ href: null }} />
+          <Tabs.Screen name="visit-details" options={{ href: null }} />
+          <Tabs.Screen name="schedule-details" options={{ href: null }} />
         </Tabs>
 
         <RepFabMenu 
@@ -103,7 +102,6 @@ export default function RepLayout() {
           }}
         />
       </>
-    </VisitsProvider>
   );
 }
 
