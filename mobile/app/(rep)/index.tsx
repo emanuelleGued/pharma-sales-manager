@@ -19,6 +19,7 @@ export default function RepHomeScreen() {
   
   const [showToast, setShowToast] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const toastMessage = (params.toastMessage as string) || 'Visita registrada com sucesso!';
 
   useEffect(() => {
     if (params.success) { 
@@ -54,7 +55,7 @@ export default function RepHomeScreen() {
             <View style={styles.iconCircle}>
               <Feather name="check" size={14} color="#00A896" />
             </View>
-            <Text style={styles.toastText}>Visita registrada com sucesso!</Text>
+            <Text style={styles.toastText}>{toastMessage}</Text>
           </View>
         </Animated.View>
       )}

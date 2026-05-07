@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, TextInput, Switch } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
@@ -8,12 +8,25 @@ export default function VisitDetailsScreen() {
   const router = useRouter();
   const [selectedResult, setSelectedResult] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
+  const [goalAchieved, setGoalAchieved] = useState(false);
 
   const results = [
     { id: 'completed', label: 'Visita Concluída', icon: 'check-circle' as const },
     { id: 'rescheduled', label: 'Reagendada', icon: 'clock' as const },
     { id: 'canceled', label: 'Não Realizada/Cancelada', icon: 'x-circle' as const },
   ];
+
+  const handleSubmit = () => {
+    let message = 'Visita atualizada com sucesso!';
+    if (selectedResult === 'completed') message = 'Visita concluída com sucesso!';
+    else if (selectedResult === 'rescheduled') message = 'Visita reagendada!';
+    else if (selectedResult === 'canceled') message = 'Visita cancelada!';
+
+    router.replace({
+      pathname: '/(rep)',
+      params: { success: Date.now().toString(), toastMessage: message }
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -82,6 +95,21 @@ export default function VisitDetailsScreen() {
           ))}
         </View>
 
+        {selectedResult === 'completed' && (
+          <View style={styles.goalCard}>
+            <View style={styles.goalTextContainer}>
+              <Text style={styles.goalTitle}>Meta atingida nesta visita?</Text>
+              <Text style={styles.goalSubtext}>Marque se houve sucesso comercial</Text>
+            </View>
+            <Switch
+              value={goalAchieved}
+              onValueChange={setGoalAchieved}
+              trackColor={{ false: '#E2E8F0', true: colors.secondary }}
+              thumbColor={'#FFFFFF'}
+            />
+          </View>
+        )}
+
         {/* Notas Rápidas */}
         <Text style={styles.sectionTitle}>Notas Rápidas</Text>
         <TextInput
@@ -96,7 +124,7 @@ export default function VisitDetailsScreen() {
         />
 
         {/* Bottom Button */}
-        <TouchableOpacity style={styles.submitButton} activeOpacity={0.7} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.submitButton} activeOpacity={0.7} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Confirmar e Atualizar Meta</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -131,7 +159,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 120, // increased padding to clear the absolute tab bar
   },
   doctorCard: {
     flexDirection: 'row',
@@ -229,6 +257,30 @@ const styles = StyleSheet.create({
   },
   resultTextSelected: {
     color: colors.text,
+  },
+  goalCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    backgroundColor: colors.background,
+    marginBottom: 24,
+  },
+  goalTextContainer: {
+    flex: 1,
+  },
+  goalTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginBottom: 2,
+  },
+  goalSubtext: {
+    fontSize: 13,
+    color: colors.textSecondary,
   },
   textArea: {
     borderWidth: 1,
