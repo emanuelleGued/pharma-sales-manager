@@ -85,6 +85,9 @@ export default function RepLayout() {
         <Tabs.Screen name="schedule-return" options={{ href: null }} />
         <Tabs.Screen name="profile" options={{ href: null }} />
         <Tabs.Screen name="notifications" options={{ href: null }} />
+        <Tabs.Screen name="change-password" options={{ href: null }} />
+        <Tabs.Screen name="notification-settings" options={{ href: null }} />
+        <Tabs.Screen name="personal-data" options={{ href: null }} />
       </Tabs>
 
       <RepFabMenu 
