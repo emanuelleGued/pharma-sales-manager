@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
-import { MOCK_DOCTORS, Doctor } from '../../src/mocks/doctors';
+import { MOCK_DOCTORS, Doctor } from '../../mocks/docktors';
 
 export default function DoctorsScreen() {
   const [doctors, setDoctors] = useState<Doctor[]>(MOCK_DOCTORS);
@@ -87,6 +87,7 @@ export default function DoctorsScreen() {
             <View style={styles.doctorInfo}>
               <Text style={styles.doctorName}>{item.name}</Text>
               <Text style={styles.doctorSpecialty}>{item.specialty}</Text>
+              <Text style={styles.doctorClinic}>{item.clinicName} • {item.location}</Text>
             </View>
             <View style={styles.checkButton}>
               {item.visited ? (
@@ -210,6 +211,11 @@ const styles = StyleSheet.create({
   },
   doctorSpecialty: {
     fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 2,
+  },
+  doctorClinic: {
+    fontSize: 13,
     color: colors.textSecondary,
   },
   checkButton: {

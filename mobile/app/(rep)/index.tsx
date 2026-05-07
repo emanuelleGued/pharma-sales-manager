@@ -37,6 +37,7 @@ export default function RepHomeScreen() {
               doctorName={visit.name}
               specialty={visit.spec}
               clinic={visit.clinic}
+              onPress={() => router.push('/(rep)/visit-details')}
             />
           ))}
         </View>
