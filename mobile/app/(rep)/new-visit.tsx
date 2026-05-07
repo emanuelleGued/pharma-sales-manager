@@ -30,6 +30,7 @@ export default function NewVisitScreen() {
   const [visitDate, setVisitDate] = useState('');
   const [visitTime, setVisitTime] = useState('');
   const [observations, setObservations] = useState('');
+  const [presentedMaterial, setPresentedMaterial] = useState('');
   
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
@@ -68,13 +69,15 @@ export default function NewVisitScreen() {
         doctor: selectedDoctor,
         date: visitDate,
         time: visitTime,
-        observations: observations
+        observations: observations,
+        presentedMaterial: presentedMaterial,
       });
 
       setSelectedDoctor(null);
       setVisitDate('');
       setVisitTime('');
       setObservations('');
+      setPresentedMaterial('');
 
       router.replace({
         pathname: '/(rep)',
@@ -202,6 +205,29 @@ export default function NewVisitScreen() {
                 onChange={onTimeChange}
               />
             )}
+          </View>
+
+          {/* Card: Material Apresentado */}
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Material Apresentado</Text>
+            <View style={[
+              styles.textAreaContainer,
+              focusedField === 'material' && styles.inputContainerFocused
+            ]}>
+              <Feather name="package" size={20} color="#00A896" style={styles.textAreaIcon} />
+              <TextInput
+                style={styles.textArea}
+                value={presentedMaterial}
+                onChangeText={setPresentedMaterial}
+                onFocus={() => setFocusedField('material')}
+                onBlur={() => setFocusedField(null)}
+                placeholder="Ex: Folder de produtos, amostras..."
+                placeholderTextColor={colors.textSecondary}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
+            </View>
           </View>
 
           {/* Card: Observações */}
