@@ -4,16 +4,23 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  ScrollView,
+  Alert,
 } from 'react-native';
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import VisitCard from '../../src/components/VisitCard';
+import { MOCK_DOCTORS } from '@/src/mocks/doctors';
+import { useVisits } from '../../src/context/VisitsContext'; // ← novo
 
 export default function AgendaScreen() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split('T')[0]
   );
+  const { visits, deleteVisit } = useVisits(); // ← novo (removeu MOCK_VISITS)
+  const router = useRouter(); // ← novo
 
   const getWeekDays = (date: Date) => {
     const start = new Date(date);
@@ -51,28 +58,12 @@ export default function AgendaScreen() {
     setCurrentDate(prev);
   };
 
-  const visits = [
-    {
-      id: 1,
-      name: 'Dr. Carlos Mendes',
-      specialty: 'Clínico Geral',
-      clinic: 'Clínica Vida',
-      date: '2026-04-18',
-      time: '09:00',
-    },
-    {
-      id: 2,
-      name: 'Dra. Fernanda Lima',
-      specialty: 'Pediatra',
-      clinic: 'Clínica Infantil',
-      date: '2026-04-18',
-      time: '10:30',
-    },
-  ];
-
-  const filteredVisits = visits.filter(
-    (visit) => visit.date === selectedDate
-  );
+  const filteredVisits = visits // ← era MOCK_VISITS
+    .filter((visit) => visit.date === selectedDate)
+    .map((visit) => {
+      const doctor = MOCK_DOCTORS.find((doc) => doc.id === visit.doctorId);
+      return { ...visit, doctor };
+    });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -98,28 +89,16 @@ export default function AgendaScreen() {
       <View style={styles.weekContainer}>
         {week.map((item) => {
           const isSelected = item.date === selectedDate;
-
           return (
             <TouchableOpacity
               key={item.date}
               style={[styles.dayBox, isSelected && styles.selectedDay]}
               onPress={() => setSelectedDate(item.date)}
             >
-              <Text
-                style={[
-                  styles.dayLabel,
-                  isSelected && styles.selectedText,
-                ]}
-              >
+              <Text style={[styles.dayLabel, isSelected && styles.selectedText]}>
                 {item.label}
               </Text>
-
-              <Text
-                style={[
-                  styles.dayNumber,
-                  isSelected && styles.selectedText,
-                ]}
-              >
+              <Text style={[styles.dayNumber, isSelected && styles.selectedText]}>
                 {item.day}
               </Text>
             </TouchableOpacity>
@@ -128,23 +107,38 @@ export default function AgendaScreen() {
       </View>
 
       {/* LISTA */}
-      <View style={styles.list}>
-        <Text style={styles.title}>Visitas do dia</Text>
+      <View style={styles.listContainer}>
+        <ScrollView
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          style={{ overflow: 'visible' }}
+        >
+          <Text style={styles.title}>
+            Visitas do dia ({filteredVisits.length})
+          </Text>
 
-        {filteredVisits.length > 0 ? (
-          filteredVisits.map((visit) => (
-            <VisitCard
-              key={visit.id}
-              time={visit.time}
-              doctorName={visit.name}
-              specialty={visit.specialty}
-              clinic={visit.clinic}
-              onPress={() => console.log('Abrir visita', visit.id)}
-            />
-          ))
-        ) : (
-          <Text style={styles.empty}>Nenhuma visita</Text>
-        )}
+          {filteredVisits.length > 0 ? (
+            filteredVisits.map(({ id, time, doctor }) => (
+              <VisitCard
+                key={id}
+                time={time}
+                doctorName={doctor?.name || ''}
+                specialty={doctor?.specialty || ''}
+                clinic={doctor?.clinicName || ''}
+                onPress={() => router.push({ pathname: '/(rep)/visit_detail', params: { id } })}
+                onEdit={() => router.push({ pathname: '/(rep)/edit_visit', params: { id } })}
+                onDelete={() =>
+                  Alert.alert('Excluir visita', 'Tem certeza?', [
+                    { text: 'Cancelar', style: 'cancel' },
+                    { text: 'Excluir', style: 'destructive', onPress: () => deleteVisit(id) },
+                  ])
+                }
+              />
+            ))
+          ) : (
+            <Text style={styles.empty}>Nenhuma visita</Text>
+          )}
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
@@ -211,6 +205,12 @@ const styles = StyleSheet.create({
 
   list: {
     padding: 16,
+    overflow: 'visible',
+  },
+
+  listContainer: {
+    flex: 1,
+    overflow: 'visible',
   },
 
   title: {
