@@ -1,9 +1,11 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
+import { VisitProvider } from '../src/context/VisitContext';
+
 export default function RootLayout() {
   return (
-    <>
+    <VisitProvider>
       <Stack
         screenOptions={{
           headerShown: false,
@@ -13,6 +15,6 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
       </Stack>
       <StatusBar style="dark" />
-    </>
+    </VisitProvider>
   );
 }

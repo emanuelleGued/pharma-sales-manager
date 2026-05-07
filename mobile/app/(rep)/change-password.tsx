@@ -19,14 +19,15 @@ export default function ChangePasswordScreen() {
   });
 
   const handleSubmit = () => {
-    if (formData.newPassword !== formData.confirmPassword) {
-      Alert.alert("Erro", "As senhas não coincidem.");
-      return;
-    }
-    Alert.alert("Sucesso", "Sua senha foi atualizada.", [
-      { text: "OK", onPress: () => router.back() }
-    ]);
-  };
+  if (formData.newPassword !== formData.confirmPassword) {
+    Alert.alert("Erro", "As senhas não coincidem.");
+    return;
+  }
+  router.replace({
+    pathname: '/(rep)/profile',
+    params: { success: 'password_updated' }
+  });
+};
 
   return (
     <SafeAreaView style={styles.container}>
