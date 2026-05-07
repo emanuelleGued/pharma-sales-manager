@@ -10,6 +10,8 @@ import {
   Modal,
   FlatList,
   Alert,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -28,6 +30,7 @@ export default function NewVisitScreen() {
   const [visitDate, setVisitDate] = useState('');
   const [visitTime, setVisitTime] = useState('');
   const [observations, setObservations] = useState('');
+  const [presentedMaterial, setPresentedMaterial] = useState('');
   
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
@@ -66,13 +69,15 @@ export default function NewVisitScreen() {
         doctor: selectedDoctor,
         date: visitDate,
         time: visitTime,
-        observations: observations
+        observations: observations,
+        presentedMaterial: presentedMaterial,
       });
 
       setSelectedDoctor(null);
       setVisitDate('');
       setVisitTime('');
       setObservations('');
+      setPresentedMaterial('');
 
       router.replace({
         pathname: '/(rep)',
@@ -103,166 +108,198 @@ export default function NewVisitScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {isEditMode ? 'Editar Visita' : 'Registrar Visita'}
-        </Text>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        
-        {/* Card: Informações Básicas */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Informações Básicas</Text>
-
-          {/* Seleção de Médico */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>NOME DO MÉDICO</Text>
-            <TouchableOpacity 
-              activeOpacity={0.8}
-              onPress={() => setIsDoctorModalOpen(true)}
-              style={[
-                styles.inputContainer,
-                isDoctorModalOpen && styles.inputContainerFocused
-              ]}
-            >
-              <Feather name="user" size={20} color="#00A896" style={styles.inputIcon} />
-              <Text style={selectedDoctor ? styles.inputText : styles.placeholderText}>
-                {selectedDoctor ? selectedDoctor.name : 'Selecionar médico...'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.row}>
-            {/* Data da Visita */}
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.label}>DATA</Text>
-              <TouchableOpacity 
-                activeOpacity={0.7}
-                onPress={() => {
-                  console.log("Abrindo Data..."); 
-                  setShowDatePicker(true);
-                }}
-                style={styles.inputContainer}
-              >
-                <Feather name="calendar" size={20} color="#00A896" style={styles.inputIcon} />
-                <Text style={visitDate ? styles.inputText : styles.placeholderText}>
-                  {visitDate || 'Selecionar...'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Horário da Visita */}
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.label}>HORÁRIO</Text>
-              <TouchableOpacity 
-                activeOpacity={0.7}
-                onPress={() => {
-                  console.log("Abrindo Hora..."); 
-                  setShowTimePicker(true);
-                }}
-                style={styles.inputContainer}
-              >
-                <Feather name="clock" size={20} color="#00A896" style={styles.inputIcon} />
-                <Text style={visitTime ? styles.inputText : styles.placeholderText}>
-                  {visitTime || 'Selecionar...'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {showDatePicker && (
-            <DateTimePicker
-              value={date || new Date()}
-              mode="date"
-              display="default"
-              onChange={onDateChange}
-            />
-          )}
-
-          {showTimePicker && (
-            <DateTimePicker
-              value={date || new Date()}
-              mode="time"
-              is24Hour={true}
-              display="spinner"
-              onChange={onTimeChange}
-            />
-          )}
-        </View>
-
-        {/* Card: Observações */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Observações</Text>
-          <View style={[
-            styles.textAreaContainer,
-            focusedField === 'notes' && styles.inputContainerFocused
-          ]}>
-            <Feather name="file-text" size={20} color="#00A896" style={styles.textAreaIcon} />
-            <TextInput
-              style={styles.textArea}
-              value={observations}
-              onChangeText={setObservations}
-              onFocus={() => setFocusedField('notes')}
-              onBlur={() => setFocusedField(null)}
-              placeholder="Adicione notas sobre a visita..."
-              placeholderTextColor={colors.textSecondary}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
-          </View>
-        </View>
-
-        {/* Botão Salvar */}
-        <TouchableOpacity 
-          style={[
-            styles.submitButton,
-            isFormValid ? styles.submitButtonActive : styles.submitButtonDisabled
-          ]} 
-          onPress={handleSubmit}
-          disabled={!isFormValid}
-          activeOpacity={0.7}
-        >
-          <Text style={[
-            styles.submitButtonText,
-            isFormValid ? styles.submitButtonTextActive : styles.submitButtonTextDisabled
-          ]}>
-            {isEditMode ? 'Salvar Alterações' : 'Confirmar Cadastro'}
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
-
-      {/* Modal de Seleção de Médico */}
-      <Modal
-        visible={isDoctorModalOpen}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsDoctorModalOpen(false)}
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Selecionar Médico</Text>
-              <TouchableOpacity onPress={() => setIsDoctorModalOpen(false)}>
-                <Feather name="x" size={24} color={colors.text} />
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Feather name="arrow-left" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>
+            {isEditMode ? 'Editar Visita' : 'Registrar Visita'}
+          </Text>
+        </View>
+
+        <ScrollView 
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
+          
+          {/* Card: Informações Básicas */}
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Informações Básicas</Text>
+
+            {/* Seleção de Médico */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>NOME DO MÉDICO</Text>
+              <TouchableOpacity 
+                activeOpacity={0.8}
+                onPress={() => setIsDoctorModalOpen(true)}
+                style={[
+                  styles.inputContainer,
+                  isDoctorModalOpen && styles.inputContainerFocused
+                ]}
+              >
+                <Feather name="user" size={20} color="#00A896" style={styles.inputIcon} />
+                <Text style={selectedDoctor ? styles.inputText : styles.placeholderText}>
+                  {selectedDoctor ? selectedDoctor.name : 'Selecionar médico...'}
+                </Text>
               </TouchableOpacity>
             </View>
-            
-            <FlatList
-              data={MOCK_DOCTORS}
-              keyExtractor={(item) => item.id}
-              renderItem={renderDoctorItem}
-              contentContainerStyle={styles.modalList}
-              showsVerticalScrollIndicator={false}
-            />
+
+            <View style={styles.row}>
+              {/* Data da Visita */}
+              <View style={[styles.inputGroup, { flex: 1 }]}>
+                <Text style={styles.label}>DATA</Text>
+                <TouchableOpacity 
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    console.log("Abrindo Data..."); 
+                    setShowDatePicker(true);
+                  }}
+                  style={styles.inputContainer}
+                >
+                  <Feather name="calendar" size={20} color="#00A896" style={styles.inputIcon} />
+                  <Text style={visitDate ? styles.inputText : styles.placeholderText}>
+                    {visitDate || 'Selecionar...'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Horário da Visita */}
+              <View style={[styles.inputGroup, { flex: 1 }]}>
+                <Text style={styles.label}>HORÁRIO</Text>
+                <TouchableOpacity 
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    console.log("Abrindo Hora..."); 
+                    setShowTimePicker(true);
+                  }}
+                  style={styles.inputContainer}
+                >
+                  <Feather name="clock" size={20} color="#00A896" style={styles.inputIcon} />
+                  <Text style={visitTime ? styles.inputText : styles.placeholderText}>
+                    {visitTime || 'Selecionar...'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={date || new Date()}
+                mode="date"
+                display="default"
+                onChange={onDateChange}
+              />
+            )}
+
+            {showTimePicker && (
+              <DateTimePicker
+                value={date || new Date()}
+                mode="time"
+                is24Hour={true}
+                display="spinner"
+                onChange={onTimeChange}
+              />
+            )}
           </View>
-        </View>
-      </Modal>
+
+          {/* Card: Material Apresentado */}
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Material Apresentado</Text>
+            <View style={[
+              styles.textAreaContainer,
+              focusedField === 'material' && styles.inputContainerFocused
+            ]}>
+              <Feather name="package" size={20} color="#00A896" style={styles.textAreaIcon} />
+              <TextInput
+                style={styles.textArea}
+                value={presentedMaterial}
+                onChangeText={setPresentedMaterial}
+                onFocus={() => setFocusedField('material')}
+                onBlur={() => setFocusedField(null)}
+                placeholder="Ex: Folder de produtos, amostras..."
+                placeholderTextColor={colors.textSecondary}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
+            </View>
+          </View>
+
+          {/* Card: Observações */}
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Observações</Text>
+            <View style={[
+              styles.textAreaContainer,
+              focusedField === 'notes' && styles.inputContainerFocused
+            ]}>
+              <Feather name="file-text" size={20} color="#00A896" style={styles.textAreaIcon} />
+              <TextInput
+                style={styles.textArea}
+                value={observations}
+                onChangeText={setObservations}
+                onFocus={() => setFocusedField('notes')}
+                onBlur={() => setFocusedField(null)}
+                placeholder="Adicione notas sobre a visita..."
+                placeholderTextColor={colors.textSecondary}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            </View>
+          </View>
+
+          {/* Botão Salvar */}
+          <TouchableOpacity 
+            style={[
+              styles.submitButton,
+              isFormValid ? styles.submitButtonActive : styles.submitButtonDisabled
+            ]} 
+            onPress={handleSubmit}
+            disabled={!isFormValid}
+            activeOpacity={0.7}
+          >
+            <Text style={[
+              styles.submitButtonText,
+              isFormValid ? styles.submitButtonTextActive : styles.submitButtonTextDisabled
+            ]}>
+              {isEditMode ? 'Salvar Alterações' : 'Confirmar Cadastro'}
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+
+        {/* Modal de Seleção de Médico */}
+        <Modal
+          visible={isDoctorModalOpen}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setIsDoctorModalOpen(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Selecionar Médico</Text>
+                <TouchableOpacity onPress={() => setIsDoctorModalOpen(false)}>
+                  <Feather name="x" size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+              
+              <FlatList
+                data={MOCK_DOCTORS}
+                keyExtractor={(item) => item.id}
+                renderItem={renderDoctorItem}
+                contentContainerStyle={styles.modalList}
+                showsVerticalScrollIndicator={false}
+              />
+            </View>
+          </View>
+        </Modal>
+      </KeyboardAvoidingView>
+      
 
     </SafeAreaView>
   );
@@ -345,11 +382,7 @@ const styles = StyleSheet.create({
   },
   inputContainerFocused: {
     borderColor: '#C8102E',
-    shadowColor: '#C8102E',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
+    borderWidth: 2,
   },
   inputIcon: {
     marginRight: 12,

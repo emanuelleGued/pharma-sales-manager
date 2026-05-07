@@ -8,6 +8,7 @@ export interface Visit {
   date: string;
   time: string;
   observations: string;
+  presentedMaterial: string;
   status: 'scheduled' | 'completed'; // Para podermos marcar como concluída depois
 }
 
