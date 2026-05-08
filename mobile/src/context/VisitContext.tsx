@@ -1,14 +1,15 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { Doctor, MOCK_DOCTORS } from '../mocks/docktors'; 
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { Doctor, MOCK_DOCTORS } from '../mocks/docktors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface Visit {
   id: string;
-  doctorId: string; 
-  doctor?: Doctor;  
+  doctorId: string;
+  doctor?: Doctor;
   date: string;
   time: string;
-  observations?: string;      
-  presentedMaterial?: string; 
+  observations?: string;
+  presentedMaterial?: string;
   status: 'scheduled' | 'completed' | 'canceled' | 'rescheduled';
 }
 
@@ -20,9 +21,42 @@ interface VisitContextData {
 }
 
 const VisitContext = createContext<VisitContextData>({} as VisitContextData);
+const VISITS_STORAGE_KEY = '@pharma_visits';
 
 export function VisitProvider({ children }: { children: ReactNode }) {
-  const [visits, setVisits] = useState<Visit[]>([]); 
+  const [visits, setVisits] = useState<Visit[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Carregar as visitas salvas na inicialização
+  useEffect(() => {
+    async function loadVisits() {
+      try {
+        const storedVisits = await AsyncStorage.getItem(VISITS_STORAGE_KEY);
+        if (storedVisits) {
+          setVisits(JSON.parse(storedVisits));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar as visitas do AsyncStorage:', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    }
+    loadVisits();
+  }, []);
+
+
+  useEffect(() => {
+    async function saveVisits() {
+      if (isLoaded) {
+        try {
+          await AsyncStorage.setItem(VISITS_STORAGE_KEY, JSON.stringify(visits));
+        } catch (error) {
+          console.error('Erro ao salvar as visitas no AsyncStorage:', error);
+        }
+      }
+    }
+    saveVisits();
+  }, [visits, isLoaded]);
 
   const addVisit = (visitData: Omit<Visit, 'id' | 'status'>) => {
     const newVisit: Visit = {
