@@ -33,7 +33,7 @@ O BioFarma soluciona a fragmentação de dados entre a equipe de campo e a gest�
 ### Instalação e Execução
 
 1. Clone o repositório:
-       git clone https://github.com/seu-usuario/pharma-sales-manager.git
+       git clone https://github.com/emanuelleGued/pharma-sales-manager.git
 
 2. Acesse o diretório:
        cd pharma-sales-manager
