@@ -9,7 +9,7 @@ export interface Visit {
   time: string;
   observations?: string;      
   presentedMaterial?: string; 
-  status: 'scheduled' | 'completed';
+  status: 'scheduled' | 'completed' | 'canceled' | 'rescheduled';
 }
 
 interface VisitContextData {

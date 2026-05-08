@@ -12,6 +12,15 @@ export default function RepHomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { visits, deleteVisit } = useVisits();
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'completed': return 'Realizada';
+      case 'canceled': return 'Cancelada';
+      case 'rescheduled': return 'Reagendada';
+      default: return 'Pendente';
+    }
+  };
   const todayString = new Date().toISOString().split('T')[0];
   const todayVisits = visits.filter(v => v.date === todayString);
 
@@ -68,10 +77,10 @@ export default function RepHomeScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.progressContainer}>
-           <Text style={styles.progressText}>4 / 10</Text>
+           <Text style={styles.progressText}>{completedToday} / 10</Text>
            <Text style={styles.subText}>Visitas realizadas hoje</Text>
            <View style={styles.badgeMeta}>
-              <Text style={styles.badgeText}>40% da meta</Text>
+              <Text style={styles.badgeText}>{Math.round(progressPercent)}% da meta</Text>
            </View>
         </View>
 
@@ -92,6 +101,7 @@ export default function RepHomeScreen() {
                   doctorName={doctor?.name || 'Médico não encontrado'}       
                   specialty={doctor?.specialty || ''}
                   clinic={doctor?.clinicName || ''}
+                  status={getStatusLabel(visit.status) as any}
                   onPress={() => router.push({ 
                     pathname: '/(rep)/visit-details', 
                     params: { id: visit.id } 

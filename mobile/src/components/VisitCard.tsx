@@ -8,7 +8,7 @@ interface VisitCardProps {
   doctorName: string;
   specialty: string;
   clinic: string;
-  status?: 'Realizada' | 'Pendente';
+  status?: 'Realizada' | 'Pendente' | 'Cancelada' | 'Reagendada';
   onPress?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -59,17 +59,19 @@ export default function VisitCard({
         <View
           style={[
             styles.statusBadge,
-            status === 'Realizada'
-              ? styles.statusDone
-              : styles.statusPending,
+            status === 'Realizada' && styles.statusDone,
+            status === 'Pendente' && styles.statusPending,
+            status === 'Cancelada' && styles.statusCanceled,
+            status === 'Reagendada' && styles.statusRescheduled,
           ]}
         >
           <Text
             style={[
               styles.statusText,
-              status === 'Realizada'
-                ? styles.statusDoneText
-                : styles.statusPendingText,
+              status === 'Realizada' && styles.statusDoneText,
+              status === 'Pendente' && styles.statusPendingText,
+              status === 'Cancelada' && styles.statusCanceledText,
+              status === 'Reagendada' && styles.statusRescheduledText,
             ]}
           >
             {status}
@@ -237,5 +239,21 @@ const styles = StyleSheet.create({
 
   statusPendingText: {
     color: colors.textSecondary,
+  },
+
+  statusCanceled: {
+    backgroundColor: '#FEE2E2',
+  },
+
+  statusCanceledText: {
+    color: '#EF4444',
+  },
+
+  statusRescheduled: {
+    backgroundColor: '#FEF3C7',
+  },
+
+  statusRescheduledText: {
+    color: '#F59E0B',
   },
 });

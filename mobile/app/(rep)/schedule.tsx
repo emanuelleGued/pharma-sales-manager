@@ -22,6 +22,15 @@ export default function ScheduleScreen() {
   const { visits, deleteVisit } = useVisits(); 
   const router = useRouter(); 
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'completed': return 'Realizada';
+      case 'canceled': return 'Cancelada';
+      case 'rescheduled': return 'Reagendada';
+      default: return 'Pendente';
+    }
+  };
+
   const getWeekDays = (date: Date) => {
     const start = new Date(date);
     const day = start.getDay();
@@ -118,13 +127,14 @@ export default function ScheduleScreen() {
           </Text>
 
           {filteredVisits.length > 0 ? (
-            filteredVisits.map(({ id, time, doctor }) => (
+            filteredVisits.map(({ id, time, doctor, status }) => (
               <VisitCard
                 key={id}
                 time={time}
                 doctorName={doctor?.name || ''}
                 specialty={doctor?.specialty || ''}
                 clinic={doctor?.clinicName || ''}
+                status={getStatusLabel(status) as any}
                 onPress={() => router.push({ pathname: '/(rep)/schedule-details', params: { id } })}
                 onEdit={() => router.push({ pathname: '/(rep)/edit-visit', params: { id } })}
                 onDelete={() =>
