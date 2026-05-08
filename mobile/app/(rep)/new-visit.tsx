@@ -163,7 +163,11 @@ export default function NewVisitScreen() {
                   style={styles.inputContainer}
                 >
                   <Feather name="calendar" size={20} color="#00A896" style={styles.inputIcon} />
-                  <Text style={visitDate ? styles.inputText : styles.placeholderText}>
+                  <Text 
+                    style={visitDate ? styles.inputText : styles.placeholderText}
+                    numberOfLines={1} 
+                    adjustsFontSizeToFit
+                  >
                     {visitDate || 'Selecionar...'}
                   </Text>
                 </TouchableOpacity>
@@ -362,6 +366,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
     marginTop: 20,
+    width: '100%',
   },
   inputGroup: {
     gap: 8,
