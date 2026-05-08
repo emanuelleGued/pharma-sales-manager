@@ -1,51 +1,51 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { Doctor } from '../mocks/doctors';
+import { Doctor, MOCK_DOCTORS } from '../mocks/docktors'; 
 
-// Definindo como é o formato de uma Visita no nosso app
 export interface Visit {
   id: string;
-  doctor: Doctor;
+  doctorId: string; 
+  doctor?: Doctor;  
   date: string;
   time: string;
-  observations: string;
-  presentedMaterial: string;
-  status: 'scheduled' | 'completed'; // Para podermos marcar como concluída depois
+  observations?: string;      
+  presentedMaterial?: string; 
+  status: 'scheduled' | 'completed' | 'canceled' | 'rescheduled';
 }
 
-// Definindo o que o nosso Contexto vai exportar para as telas
 interface VisitContextData {
   visits: Visit[];
   addVisit: (visit: Omit<Visit, 'id' | 'status'>) => void;
+  updateVisit: (updated: Visit) => void;
+  deleteVisit: (id: string) => void;
 }
 
 const VisitContext = createContext<VisitContextData>({} as VisitContextData);
 
 export function VisitProvider({ children }: { children: ReactNode }) {
-  // Estado global que guarda a lista de visitas
-  const [visits, setVisits] = useState<Visit[]>([]);
+  const [visits, setVisits] = useState<Visit[]>([]); 
 
-  // Função para adicionar uma nova visita
   const addVisit = (visitData: Omit<Visit, 'id' | 'status'>) => {
     const newVisit: Visit = {
       ...visitData,
-      id: Math.random().toString(36).substring(2, 9), // Gera um ID aleatório simples
-      status: 'scheduled', // Toda nova visita começa como agendada
+      id: Math.random().toString(36).substring(2, 9),
+      status: 'scheduled',
     };
-    
-    setVisits((prevVisits) => [...prevVisits, newVisit]);
+    setVisits((prev) => [newVisit, ...prev]);
+  };
+
+  const updateVisit = (updated: Visit) => {
+    setVisits((prev) => prev.map((v) => (v.id === updated.id ? updated : v)));
+  };
+
+  const deleteVisit = (id: string) => {
+    setVisits((prev) => prev.filter((v) => v.id !== id));
   };
 
   return (
-    <VisitContext.Provider value={{ visits, addVisit }}>
+    <VisitContext.Provider value={{ visits, addVisit, updateVisit, deleteVisit }}>
       {children}
     </VisitContext.Provider>
   );
 }
 
-export const useVisits = () => {
-  const context = useContext(VisitContext);
-  if (!context) {
-    throw new Error('useVisits deve ser usado dentro de um VisitProvider');
-  }
-  return context;
-};
+export const useVisits = () => useContext(VisitContext);

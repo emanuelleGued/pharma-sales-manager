@@ -1,3 +1,4 @@
+import { Visit } from '../context/VisitContext';
 export type Doctor = {
   id: string;
   name: string;

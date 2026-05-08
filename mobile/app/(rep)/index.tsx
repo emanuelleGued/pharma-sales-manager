@@ -1,17 +1,27 @@
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, Animated } from 'react-native';
-import { VisitCard } from '../../src/components/VisitCard'; 
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, Animated, Alert } from 'react-native';
+import VisitCard from '../../src/components/VisitCard'; 
 import { Header } from '../../src/components/Header'; 
 import { colors } from '../../src/theme/colors';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useVisits } from '../../src/context/VisitContext';
 import { useEffect, useState, useRef } from 'react'; 
 import { Feather } from '@expo/vector-icons'; 
+import { MOCK_DOCTORS } from '@/src/mocks/docktors';
 
 export default function RepHomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { visits } = useVisits();
-  const todayString = new Intl.DateTimeFormat('pt-BR').format(new Date());
+  const { visits, deleteVisit } = useVisits();
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'completed': return 'Realizada';
+      case 'canceled': return 'Cancelada';
+      case 'rescheduled': return 'Reagendada';
+      default: return 'Pendente';
+    }
+  };
+  const todayString = new Date().toISOString().split('T')[0];
   const todayVisits = visits.filter(v => v.date === todayString);
 
   const completedToday = todayVisits.filter(v => v.status === 'completed').length;
@@ -20,6 +30,7 @@ export default function RepHomeScreen() {
   const [showToast, setShowToast] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const toastMessage = (params.toastMessage as string) || 'Visita registrada com sucesso!';
+  
 
   useEffect(() => {
     if (params.success) { 
@@ -66,10 +77,10 @@ export default function RepHomeScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.progressContainer}>
-           <Text style={styles.progressText}>4 / 10</Text>
+           <Text style={styles.progressText}>{completedToday} / 10</Text>
            <Text style={styles.subText}>Visitas realizadas hoje</Text>
            <View style={styles.badgeMeta}>
-              <Text style={styles.badgeText}>40% da meta</Text>
+              <Text style={styles.badgeText}>{Math.round(progressPercent)}% da meta</Text>
            </View>
         </View>
 
@@ -80,16 +91,31 @@ export default function RepHomeScreen() {
               Nenhuma visita registrada ainda. Vá na tela de adicionar para começar!
             </Text>
           ) : (
-            todayVisits.map((visit) => (
-              <VisitCard
-                key={visit.id}
-                time={visit.time}
-                doctorName={visit.doctor.name}       
-                specialty={visit.doctor.specialty}
-                clinic={visit.doctor.clinicName}
-                onPress={() => router.push('/(rep)/visit-details')}
-              />
-            ))
+            todayVisits.map((visit) => {
+              const doctor = MOCK_DOCTORS.find((d) => d.id === visit.doctorId);
+
+              return (
+                <VisitCard
+                  key={visit.id}
+                  time={visit.time}
+                  doctorName={doctor?.name || 'Médico não encontrado'}       
+                  specialty={doctor?.specialty || ''}
+                  clinic={doctor?.clinicName || ''}
+                  status={getStatusLabel(visit.status) as any}
+                  onPress={() => router.push({ 
+                    pathname: '/(rep)/visit-details', 
+                    params: { id: visit.id } 
+                  })}
+                  onEdit={() => router.push({ pathname: '/(rep)/edit-visit', params: { id: visit.id } })}
+                  onDelete={() => {
+                    Alert.alert("Excluir", "Deseja excluir esta visita?", [
+                      { text: "Não" },
+                      { text: "Sim", onPress: () => deleteVisit(visit.id) }
+                    ]);
+                  }}
+                />
+              );
+            }) 
           )}
         </View>
       </ScrollView>

@@ -16,7 +16,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../../src/theme/colors';
-import { MOCK_DOCTORS, Doctor } from '../../mocks/docktors';
+import { MOCK_DOCTORS, Doctor } from '../../src/mocks/docktors';
 import { useVisits } from '../../src/context/VisitContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -65,9 +65,10 @@ export default function NewVisitScreen() {
 
   const handleSubmit = () => {
     if (selectedDoctor && visitDate && visitTime) {
+      const isoDate = date.toISOString().split('T')[0];
       addVisit({
-        doctor: selectedDoctor,
-        date: visitDate,
+        doctorId: selectedDoctor.id, 
+        date: isoDate,
         time: visitTime,
         observations: observations,
         presentedMaterial: presentedMaterial,
@@ -162,7 +163,11 @@ export default function NewVisitScreen() {
                   style={styles.inputContainer}
                 >
                   <Feather name="calendar" size={20} color="#00A896" style={styles.inputIcon} />
-                  <Text style={visitDate ? styles.inputText : styles.placeholderText}>
+                  <Text 
+                    style={visitDate ? styles.inputText : styles.placeholderText}
+                    numberOfLines={1} 
+                    adjustsFontSizeToFit
+                  >
                     {visitDate || 'Selecionar...'}
                   </Text>
                 </TouchableOpacity>
@@ -334,9 +339,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
     color: colors.text 
   },
-  content: { 
-    padding: 24,
-    gap: 20,
+  content: {
+    paddingHorizontal: 20, 
+    paddingBottom: 120, 
+    gap: 16, 
   },
   card: {
     backgroundColor: '#FFFFFF',
@@ -360,6 +366,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
     marginTop: 20,
+    width: '100%',
   },
   inputGroup: {
     gap: 8,
@@ -422,14 +429,15 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   submitButton: {
-    width: '100%',
-    paddingVertical: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 18,
+  borderWidth: 2,
+  borderRadius: 16,
+  marginTop: 10, 
+  marginBottom: 20,
+},
   submitButtonActive: {
     backgroundColor: 'transparent',
     borderColor: '#C8102E',
@@ -439,10 +447,10 @@ const styles = StyleSheet.create({
     borderColor: '#D1D5DB',
   },
   submitButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-  },
+  color: colors.primary, 
+    fontWeight: 'bold', 
+    fontSize: 16 
+},
   submitButtonTextActive: {
     color: '#C8102E',
   },

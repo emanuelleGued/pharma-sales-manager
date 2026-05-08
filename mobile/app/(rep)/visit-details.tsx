@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, TextInput, Switch } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../../src/theme/colors';
+import { useVisits } from '../../src/context/VisitContext';
+import { MOCK_DOCTORS } from '../../src/mocks/docktors';
 
 export default function VisitDetailsScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const { id } = params;
+  
+  const { visits, updateVisit } = useVisits();
+  const visit = visits.find(v => v.id === id);
+  const doctor = MOCK_DOCTORS.find(d => d.id === visit?.doctorId);
+
   const [selectedResult, setSelectedResult] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
   const [goalAchieved, setGoalAchieved] = useState(false);
@@ -21,6 +30,14 @@ export default function VisitDetailsScreen() {
     if (selectedResult === 'completed') message = 'Visita concluída com sucesso!';
     else if (selectedResult === 'rescheduled') message = 'Visita reagendada!';
     else if (selectedResult === 'canceled') message = 'Visita cancelada!';
+
+    if (visit && selectedResult) {
+      updateVisit({
+        ...visit,
+        status: selectedResult as 'completed' | 'canceled' | 'rescheduled',
+        observations: notes,
+      });
+    }
 
     router.replace({
       pathname: '/(rep)',
@@ -45,19 +62,19 @@ export default function VisitDetailsScreen() {
             <Feather name="map-pin" size={24} color={colors.secondary} />
           </View>
           <View style={styles.detailsContainer}>
-            <Text style={styles.doctorName}>Dr. Marcos</Text>
-            <Text style={styles.doctorSpecialty}>Cardiologista</Text>
+            <Text style={styles.doctorName}>{doctor?.name || 'Médico não encontrado'}</Text>
+            <Text style={styles.doctorSpecialty}>{doctor?.specialty || ''}</Text>
             
             <View style={styles.spacer} />
 
-            <Text style={styles.infoText}>Clínica Coração Saudável</Text>
-            <Text style={styles.infoText}>Av. Paulista, 1000 - São Paulo, SP</Text>
+            <Text style={styles.infoText}>{doctor?.clinicName || ''}</Text>
+            <Text style={styles.infoText}>{doctor?.location || ''}</Text>
             
             <View style={styles.spacer} />
             
             <View style={styles.timeRow}>
               <Feather name="clock" size={14} color={colors.secondary} />
-              <Text style={styles.timeText}>Agendado para 10:00</Text>
+              <Text style={styles.timeText}>Agendado para {visit?.time || '--:--'}</Text>
             </View>
           </View>
         </View>
@@ -159,7 +176,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 120, // increased padding to clear the absolute tab bar
+    paddingBottom: 120, 
   },
   doctorCard: {
     flexDirection: 'row',
