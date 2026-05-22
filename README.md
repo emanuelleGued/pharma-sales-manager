@@ -46,5 +46,38 @@ O BioFarma soluciona a fragmentação de dados entre a equipe de campo e a gest�
 
 5. Utilize o **Expo Go** para escanear o QR Code exibido no terminal e visualizar a aplicação.
 
+Execução do Back-end:
+
+1. Inicie o PostgreSQL com Docker
+
+   Na raíz do projeto, execute:
+   ```bash
+   docker compose up -d
+   ```
+
+2. Entre na pasta API:
+   ```bash
+   cd api
+   ```
+
+3. Inicie a API Spring Boot:
+   ```bash
+   mvn spring-boot:run
+   ```
+   A API vai rodar em:
+   ```txt
+   http://localhost:8080
+   ```
+# Configurações do Banco de Dados
+
+O banco de dados PostgreSQL roda com o Docker usando a seguinte configuração padrão:
+```yml
+spring:
+datasource:
+   url: jdbc:postgresql://localhost:5432/pharma_sales
+   username: postgres
+   password: postgres
+```
+
 ## Notas de Implementação
 O projeto utiliza um sistema de roteamento que alterna a estrutura de navegação com base no perfil de acesso (Manager/Representative). A lógica de negócio diferencia permissões de escrita, onde apenas o perfil operacional pode realizar check-ins, enquanto o perfil gerencial retém acesso exclusivo aos relatórios de auditoria.
