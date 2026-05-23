@@ -37,7 +37,6 @@ public class DoctorService {
     }
 
     public DoctorResponse create(CreateDoctorRequest request) {
-        // Verificar se o CRM já existe
         boolean crmExists = doctorRepository.existsByCrm(request.crm());
         if (crmExists) {
             throw new ResponseStatusException(

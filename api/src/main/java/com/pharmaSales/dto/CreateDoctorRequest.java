@@ -2,9 +2,7 @@ package com.pharmaSales.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-/**
- * DTO para requisição de criação de novo médico
- */
+
 public record CreateDoctorRequest(
         @NotBlank(message = "Nome é obrigatório")
         String name,
