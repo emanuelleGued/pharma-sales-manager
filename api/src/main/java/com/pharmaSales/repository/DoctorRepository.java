@@ -13,4 +13,6 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
             String nome, String especialidade);
 
     List<Doctor> findAllByOrderByNomeAsc();
+
+    boolean existsByCrm(String crm);
 }

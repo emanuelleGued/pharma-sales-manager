@@ -1,5 +1,6 @@
 package com.pharmaSales.service;
 
+import com.pharmaSales.dto.CreateDoctorRequest;
 import com.pharmaSales.dto.DoctorResponse;
 import com.pharmaSales.model.Doctor;
 import com.pharmaSales.repository.DoctorRepository;
@@ -33,5 +34,25 @@ public class DoctorService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Médico não encontrado"));
         return DoctorResponse.from(doctor);
+    }
+
+    public DoctorResponse create(CreateDoctorRequest request) {
+        // Verificar se o CRM já existe
+        boolean crmExists = doctorRepository.existsByCrm(request.crm());
+        if (crmExists) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "CRM já cadastrado");
+        }
+
+        Doctor doctor = new Doctor(
+                request.name(),
+                request.crm(),
+                request.specialty(),
+                request.clinicName(),
+                request.location()
+        );
+
+        Doctor savedDoctor = doctorRepository.save(doctor);
+        return DoctorResponse.from(savedDoctor);
     }
 }
