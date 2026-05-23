@@ -4,7 +4,8 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import { useVisits } from '../../src/context/VisitContext';
-import { MOCK_DOCTORS } from '../../src/mocks/docktors';
+import { useState, useEffect } from 'react';
+import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
 
 export default function ScheduleDetailsScreen() {
   const router = useRouter();
@@ -12,7 +13,18 @@ export default function ScheduleDetailsScreen() {
   const { visits = [], deleteVisit } = useVisits();
 
   const visit = visits.find((v) => v.id === id);
-  const doctor = MOCK_DOCTORS.find((d) => d.id === visit?.doctorId);
+  const [doctor, setDoctor] = useState<DoctorResponse | null>(null);
+
+  useEffect(() => {
+    if (visit?.doctorId) {
+      DoctorService.getAllDoctors()
+        .then((docs) => {
+          const found = docs.find((d) => d.id === visit.doctorId);
+          if (found) setDoctor(found);
+        })
+        .catch((err) => console.error('Erro ao buscar médico do agendamento:', err));
+    }
+  }, [visit?.doctorId]);
 
   if (!visit || !doctor) return null;
 

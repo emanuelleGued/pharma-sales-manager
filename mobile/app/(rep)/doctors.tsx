@@ -1,20 +1,56 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
-import { MOCK_DOCTORS, Doctor } from '../../src/mocks/docktors';
+import { Doctor } from '../../src/mocks/docktors';
+import DoctorService from '../../src/services/DoctorService';
 
 export default function DoctorsScreen() {
-  const [doctors, setDoctors] = useState<Doctor[]>(MOCK_DOCTORS);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'Todos' | 'Visitados' | 'Pendentes'>('Todos');
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
-  const handleToggleVisited = (id: string) => {
-    setDoctors(docs =>
-      docs.map(doc =>
-        doc.id === id ? { ...doc, visited: !doc.visited } : doc
-      )
-    );
+  useEffect(() => {
+    loadDoctors();
+  }, []);
+
+  const loadDoctors = async () => {
+    try {
+      setIsLoading(true);
+      setHasError(false);
+      const doctorsFromAPI = await DoctorService.getAllDoctors();
+      setDoctors(doctorsFromAPI);
+    } catch (error) {
+      console.error('Erro ao carregar médicos da API:', error);
+      setHasError(true);
+      setDoctors([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      searchDoctors(searchQuery);
+    } else {
+      loadDoctors();
+    }
+  }, [searchQuery]);
+
+  const searchDoctors = async (query: string) => {
+    try {
+      setIsLoading(true);
+      const results = await DoctorService.getAllDoctors(query);
+      setDoctors(results);
+    } catch (error) {
+      console.error('Erro ao buscar médicos:', error);
+      setHasError(true);
+      setDoctors([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const filteredDoctors = useMemo(() => {
@@ -24,7 +60,7 @@ export default function DoctorsScreen() {
 
       const matchesFilter = filter === 'Todos' ? true :
         filter === 'Visitados' ? doc.visited :
-          !doc.visited; // Pendentes
+          !doc.visited;
 
       return matchesSearch && matchesFilter;
     });
@@ -41,6 +77,19 @@ export default function DoctorsScreen() {
           <Text style={styles.visitedCountText}>{visitedCount}</Text> de {totalCount} visitados este mês
         </Text>
       </View>
+
+      {hasError && (
+        <View style={styles.errorBanner}>
+          <Feather name="alert-circle" size={16} color="#B91C1C" />
+          <Text style={styles.errorText}>Usando dados em cache</Text>
+        </View>
+      )}
+
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      )}
 
       <View style={styles.searchContainer}>
         <Feather name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
@@ -82,7 +131,6 @@ export default function DoctorsScreen() {
           <TouchableOpacity
             style={styles.doctorCard}
             activeOpacity={0.7}
-            onPress={() => handleToggleVisited(item.id)}
           >
             <View style={styles.doctorInfo}>
               <Text style={styles.doctorName}>{item.name}</Text>
@@ -126,6 +174,26 @@ const styles = StyleSheet.create({
   visitedCountText: {
     color: colors.secondary,
     fontWeight: 'bold',
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEE2E2',
+    borderBottomWidth: 1,
+    borderBottomColor: '#FECACA',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  errorText: {
+    fontSize: 13,
+    color: '#B91C1C',
+    fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -181,7 +249,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
-    paddingBottom: 100, // padding to account for bottom navigation bar
+    paddingBottom: 100,
     gap: 12,
   },
   doctorCard: {
@@ -193,7 +261,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 12,
     padding: 16,
-    // Add subtle shadow as seen in the mockup
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,

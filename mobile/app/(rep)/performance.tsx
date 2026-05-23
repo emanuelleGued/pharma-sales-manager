@@ -5,16 +5,16 @@ import { Header } from '../../src/components/Header';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useVisits } from '../../src/context/VisitContext';
-import { MOCK_DOCTORS } from '../../src/mocks/docktors';
+import { useState, useEffect } from 'react';
+import DoctorService from '../../src/services/DoctorService';
 
 export default function PerformanceScreen() {
   const router = useRouter();
   const { visits } = useVisits();
 
-  // 1. Base de Médicos
-  const totalDoctors = MOCK_DOCTORS.length;
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
+  const [totalDoctors, setTotalDoctors] = useState(0);
   
   const visitsThisMonth = visits.filter(v => {
     const d = new Date(v.date);
@@ -24,7 +24,6 @@ export default function PerformanceScreen() {
   const uniqueDoctorsVisited = new Set(visitsThisMonth.map(v => v.doctorId)).size;
   const doctorBasePercent = totalDoctors > 0 ? (uniqueDoctorsVisited / totalDoctors) * 100 : 0;
 
-  // 2. Visitas da Semana
   const weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
   const today = new Date();
   const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; 
@@ -46,16 +45,20 @@ export default function PerformanceScreen() {
 
   const maxWeeklyVisits = Math.max(...weeklyVisits, 12); 
 
-  // 3. Progresso Mensal
   const monthGoal = 200; 
   const monthProgress = visitsThisMonth.length;
   const monthPercent = (monthProgress / monthGoal) * 100;
 
-  // 4. Projeção do Mês
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const daysPassed = today.getDate();
   const projectedVisits = daysPassed > 0 ? Math.round((monthProgress / daysPassed) * daysInMonth) : 0;
   const projectedPercent = Math.round((projectedVisits / monthGoal) * 100);
+
+  useEffect(() => {
+    DoctorService.getAllDoctors()
+      .then((data) => setTotalDoctors(data.length))
+      .catch((err) => console.error('Erro ao buscar total de médicos para performance:', err));
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

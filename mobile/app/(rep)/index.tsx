@@ -6,7 +6,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useVisits } from '../../src/context/VisitContext';
 import { useEffect, useState, useRef } from 'react'; 
 import { Feather } from '@expo/vector-icons'; 
-import { MOCK_DOCTORS } from '@/src/mocks/docktors';
+import DoctorService, { DoctorResponse } from '../../src/services/DoctorService'; 
 
 export default function RepHomeScreen() {
   const router = useRouter();
@@ -30,7 +30,13 @@ export default function RepHomeScreen() {
   const [showToast, setShowToast] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const toastMessage = (params.toastMessage as string) || 'Visita registrada com sucesso!';
-  
+  const [doctors, setDoctors] = useState<DoctorResponse[]>([]);
+
+  useEffect(() => {
+    DoctorService.getAllDoctors()
+      .then((data) => setDoctors(data))
+      .catch((err) => console.error('Erro ao buscar médicos para a listagem:', err));
+  }, []);
 
   useEffect(() => {
     if (params.success) { 
@@ -92,7 +98,7 @@ export default function RepHomeScreen() {
             </Text>
           ) : (
             todayVisits.map((visit) => {
-              const doctor = MOCK_DOCTORS.find((d) => d.id === visit.doctorId);
+              const doctor = doctors.find((d) => d.id === visit.doctorId);
 
               return (
                 <VisitCard

@@ -7,11 +7,11 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import VisitCard from '../../src/components/VisitCard';
-import { MOCK_DOCTORS } from '../../src/mocks/docktors';
+import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
 import { useVisits } from '../../src/context/VisitContext'; 
 
 export default function ScheduleScreen() {
@@ -21,6 +21,13 @@ export default function ScheduleScreen() {
   );
   const { visits, deleteVisit } = useVisits(); 
   const router = useRouter(); 
+  const [doctors, setDoctors] = useState<DoctorResponse[]>([]);
+
+  useEffect(() => {
+    DoctorService.getAllDoctors()
+      .then((data) => setDoctors(data))
+      .catch((err) => console.error('Erro ao buscar lista de médicos da agenda:', err));
+  }, []);
 
   const getStatusLabel = (status: string) => {
     switch (status) {
@@ -70,7 +77,7 @@ export default function ScheduleScreen() {
   const filteredVisits = (visits || [])
     .filter((visit) => visit.date === selectedDate)
     .map((visit) => {
-      const doctor = MOCK_DOCTORS.find((doc) => doc.id === visit.doctorId);
+      const doctor = doctors.find((doc) => doc.id === visit.doctorId);
       return { ...visit, doctor };
   });
 
