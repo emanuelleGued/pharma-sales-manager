@@ -66,10 +66,13 @@ export default function NewVisitScreen() {
 
   const handleSubmit = () => {
     if (selectedDoctor && visitDate && visitTime) {
-      const isoDate = date.toISOString().split('T')[0];
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const localDate = `${year}-${month}-${day}`;
       addVisit({
         doctorId: selectedDoctor.id, 
-        date: isoDate,
+        date: localDate,
         time: visitTime,
         observations: observations,
         presentedMaterial: presentedMaterial,
