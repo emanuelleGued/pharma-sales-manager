@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { FontAwesome, Feather } from '@expo/vector-icons';
 import { colors } from '../src/theme/colors'; 
@@ -16,7 +17,9 @@ export default function LandingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+
       <View style={styles.content}>
+
         
         {/* Ícone de Logo Coração */}
         <View style={styles.logoBox}>

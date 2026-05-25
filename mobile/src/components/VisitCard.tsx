@@ -42,8 +42,8 @@ export default function VisitCard({
       activeOpacity={0.7}
     >
       <View style={styles.timeContainer}>
-        <View style={styles.iconCircle}>
-          <Feather name="clock" size={20} color={colors.secondary} />
+        <View style={styles.iconSquare}>
+          <Feather name="clock" size={24} color="#00A896" />
         </View>
 
         <Text style={styles.timeText}>{time}</Text>
@@ -52,9 +52,16 @@ export default function VisitCard({
       <View style={styles.infoContainer}>
         <Text style={styles.doctorName}>{doctorName}</Text>
 
-        <Text style={styles.specialty}>{specialty}</Text>
-
-        <Text style={styles.clinicName}>{clinic}</Text>
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailRow}>
+            <Feather name="award" size={14} color="#6B7280" />
+            <Text style={styles.specialty}>{specialty}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Feather name="map-pin" size={14} color="#6B7280" />
+            <Text style={styles.clinicName}>{clinic}</Text>
+          </View>
+        </View>
 
         <View
           style={[
@@ -120,19 +127,17 @@ export default function VisitCard({
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#E5E7EB',
     borderRadius: 16,
-    paddingVertical: 18,
-    paddingHorizontal: 16,
+    padding: 16,
     marginBottom: 12,
-    alignItems: 'center',
+    alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 5,
     elevation: 2,
-    overflow: 'visible',
     zIndex: 1,
   },
 
@@ -141,17 +146,20 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
 
-  iconCircle: {
-    backgroundColor: colors.successBackground,
-    padding: 10,
-    borderRadius: 50,
-    marginBottom: 8,
+  iconSquare: {
+    backgroundColor: 'rgba(0, 168, 150, 0.1)',
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    marginBottom: 6,
   },
 
   timeText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: colors.text,
+    color: '#00A896',
   },
 
   infoContainer: {
@@ -162,24 +170,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: 6,
+  },
+
+  detailsContainer: {
+    gap: 4,
+    marginBottom: 8,
+  },
+
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   specialty: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    marginBottom: 4,
+    fontSize: 13,
+    color: '#6B7280',
+    marginLeft: 6,
+    fontWeight: '500',
   },
 
   clinicName: {
-    fontSize: 14,
-    color: colors.textSecondary,
+    fontSize: 13,
+    color: '#6B7280',
+    marginLeft: 6,
+    fontWeight: '500',
   },
 
   menuContainer: {
     position: 'relative',
     zIndex: 999,
     elevation: 999,
+    paddingLeft: 8,
   },
 
   dropdown: {
