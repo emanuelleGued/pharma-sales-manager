@@ -21,7 +21,14 @@ export default function RepHomeScreen() {
       default: return 'Pendente';
     }
   };
-  const todayString = new Date().toISOString().split('T')[0];
+  const getLocalDateString = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const todayString = getLocalDateString(new Date());
   const todayVisits = visits.filter(v => v.date === todayString);
 
   const completedToday = todayVisits.filter(v => v.status === 'completed').length;
