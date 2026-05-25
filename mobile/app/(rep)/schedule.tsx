@@ -2,11 +2,11 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
@@ -15,6 +15,7 @@ import { MOCK_DOCTORS } from '../../src/mocks/docktors';
 import { useVisits } from '../../src/context/VisitContext'; 
 
 export default function ScheduleScreen() {
+  const insets = useSafeAreaInsets();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split('T')[0]
@@ -75,9 +76,9 @@ export default function ScheduleScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* HEADER COM MÊS */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <TouchableOpacity onPress={prevWeek}>
           <Text style={styles.arrow}>{'<'}</Text>
         </TouchableOpacity>
@@ -150,7 +151,7 @@ export default function ScheduleScreen() {
           )}
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -165,7 +166,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginTop: 16,
   },
 
   arrow: {

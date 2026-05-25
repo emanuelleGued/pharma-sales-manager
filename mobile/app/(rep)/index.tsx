@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, Animated, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView,  Animated, Alert } from 'react-native';
 import VisitCard from '../../src/components/VisitCard'; 
 import { Header } from '../../src/components/Header'; 
 import { colors } from '../../src/theme/colors';
@@ -58,7 +58,7 @@ export default function RepHomeScreen() {
   }, [params.success]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Usando o Componente Header de verdade */}
       {showToast && (
         <Animated.View style={[styles.toastWrapper, { opacity: fadeAnim }]}>
@@ -119,7 +119,7 @@ export default function RepHomeScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

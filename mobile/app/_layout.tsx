@@ -14,7 +14,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" />
       </Stack>
-      <StatusBar style="dark" />
+      <StatusBar style="dark" hidden={true} />
     </VisitProvider>
   );
 }

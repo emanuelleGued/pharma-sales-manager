@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { 
   View, 
   Text, 
-  StyleSheet, 
-  SafeAreaView, 
+  StyleSheet,  
   TouchableOpacity, 
   TextInput, 
   ScrollView, 
@@ -13,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../../src/theme/colors';
@@ -21,6 +21,7 @@ import { useVisits } from '../../src/context/VisitContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function NewVisitScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const params = useLocalSearchParams(); 
   const isEditMode = params.editMode === 'true';
@@ -108,13 +109,13 @@ export default function NewVisitScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Feather name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
@@ -306,7 +307,7 @@ export default function NewVisitScreen() {
       </KeyboardAvoidingView>
       
 
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -319,7 +320,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 20,
     paddingBottom: 20,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 2,
