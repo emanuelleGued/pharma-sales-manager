@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, Animated, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView,  Animated, Alert } from 'react-native';
 import VisitCard from '../../src/components/VisitCard'; 
 import { Header } from '../../src/components/Header'; 
 import { colors } from '../../src/theme/colors';
@@ -21,7 +21,14 @@ export default function RepHomeScreen() {
       default: return 'Pendente';
     }
   };
-  const todayString = new Date().toISOString().split('T')[0];
+  const getLocalDateString = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const todayString = getLocalDateString(new Date());
   const todayVisits = visits.filter(v => v.date === todayString);
 
   const completedToday = todayVisits.filter(v => v.status === 'completed').length;
@@ -58,7 +65,7 @@ export default function RepHomeScreen() {
   }, [params.success]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Usando o Componente Header de verdade */}
       {showToast && (
         <Animated.View style={[styles.toastWrapper, { opacity: fadeAnim }]}>
@@ -119,7 +126,7 @@ export default function RepHomeScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
