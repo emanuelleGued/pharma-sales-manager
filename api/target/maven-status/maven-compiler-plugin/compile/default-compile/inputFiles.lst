@@ -1,0 +1,12 @@
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/BiofarmaApplication.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/controller/HealthCheckController.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/controller/VisitController.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/dto/CreateVisitRequest.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/dto/UpdateVisitStatusRequest.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/model/Doctor.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/model/User.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/model/Visit.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/repository/DoctorRepository.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/repository/UserRepository.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/repository/VisitRepository.java
+/home/jeferson/pharma-sales-manager/api/src/main/java/com/pharmaSales/service/VisitService.java
