@@ -82,7 +82,6 @@ export default function RepLayout() {
 
           {/* Telas Ocultas */}
           <Tabs.Screen name="new-visit" options={{ href: null }} />
-          <Tabs.Screen name="schedule-return" options={{ href: null }} />
           <Tabs.Screen name="profile" options={{ href: null }} />
           <Tabs.Screen name="notifications" options={{ href: null }} />
           <Tabs.Screen name="change-password" options={{ href: null }} />

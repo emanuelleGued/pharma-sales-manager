@@ -1,7 +1,13 @@
 import { Platform } from 'react-native';
-const API_BASE_URL = Platform.OS === 'android'
-  ? 'http://192.168.1.14:8080/api' 
-  : 'http://localhost:8080/api';
+import Constants from 'expo-constants';
+
+const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
+const API_BASE_URL =
+  debuggerHost
+    ? `http://${debuggerHost}:8080/api`
+    : Platform.OS === 'android'
+      ? 'http://10.0.2.2:8080/api'
+      : 'http://localhost:8080/api';
 
 export interface DoctorResponse {
   id: string;
