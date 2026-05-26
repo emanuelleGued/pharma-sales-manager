@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Activity
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
-import { Doctor } from '../../src/mocks/docktors';
+import { Doctor } from '../../src/types/docktors';
 import DoctorService from '../../src/services/DoctorService';
 
 export default function DoctorsScreen() {

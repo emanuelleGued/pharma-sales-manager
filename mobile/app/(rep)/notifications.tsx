@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
-import { mockNotifications, NotificationType } from '../../src/mocks/notifications';
+import { mockNotifications, NotificationType } from '../../src/types/notifications';
 
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
