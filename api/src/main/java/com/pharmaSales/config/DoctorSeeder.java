@@ -33,9 +33,9 @@ public class DoctorSeeder {
         };
     }
 
-    private Doctor build(String nome, String crm, String especialidade, String clinica, String endereco, boolean visitado) {
-        Doctor d = new Doctor(nome, crm, especialidade, clinica, endereco);
-        d.setVisitado(visitado);
-        return d;
+    private Doctor build(String name, String crm, String specialty, String clinicName, String location, boolean visited) {
+        Doctor doctor = new Doctor(name, crm, specialty, clinicName, location);
+        doctor.setVisited(visited);
+        return doctor;
     }
 }

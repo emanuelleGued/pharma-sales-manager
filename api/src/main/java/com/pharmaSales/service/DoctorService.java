@@ -21,9 +21,9 @@ public class DoctorService {
 
     public List<DoctorResponse> list(String search) {
         List<Doctor> doctors = (search == null || search.isBlank())
-                ? doctorRepository.findAllByOrderByNomeAsc()
+                ? doctorRepository.findAllByOrderByNameAsc()
                 : doctorRepository
-                        .findByNomeContainingIgnoreCaseOrEspecialidadeContainingIgnoreCaseOrderByNomeAsc(
+                        .findByNameContainingIgnoreCaseOrSpecialtyContainingIgnoreCaseOrderByNameAsc(
                                 search.trim(), search.trim());
 
         return doctors.stream().map(DoctorResponse::from).toList();

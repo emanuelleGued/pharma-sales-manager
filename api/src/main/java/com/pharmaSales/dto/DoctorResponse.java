@@ -14,12 +14,12 @@ public record DoctorResponse(
     public static DoctorResponse from(Doctor doctor) {
         return new DoctorResponse(
                 String.valueOf(doctor.getId()),
-                doctor.getNome(),
+                doctor.getName(),
                 doctor.getCrm(),
-                doctor.getEspecialidade(),
-                doctor.getClinicaNome(),
-                doctor.getEndereco(),
-                doctor.isVisitado()
+                doctor.getSpecialty(),
+                doctor.getClinicName(),
+                doctor.getLocation(),
+                doctor.isVisited()
         );
     }
 }

@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "doctors") 
+@Table(name = "doctors")
 public class Doctor {
 
     @Id
@@ -16,83 +16,83 @@ public class Doctor {
     private Long id;
 
     @Column(nullable = false)
-    private String nome;
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String crm;
 
     @Column(nullable = false)
-    private String especialidade;
+    private String specialty;
 
-    @Column(name = "clinica_nome", nullable = false)
-    private String clinicaNome;
-
-    @Column(nullable = false)
-    private String endereco;
+    @Column(name = "clinic_name", nullable = false)
+    private String clinicName;
 
     @Column(nullable = false)
-    private boolean visitado = false;
+    private String location;
+
+    @Column(nullable = false)
+    private boolean visited = false;
 
     protected Doctor() {
     }
 
-    public Doctor(String nome, String crm, String especialidade, String clinicaNome, String endereco) {
-        this.nome = nome;
+    public Doctor(String name, String crm, String specialty, String clinicName, String location) {
+        this.name = name;
         this.crm = crm;
-        this.especialidade = especialidade;
-        this.clinicaNome = clinicaNome;
-        this.endereco = endereco;
+        this.specialty = specialty;
+        this.clinicName = clinicName;
+        this.location = location;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
     public String getCrm() {
         return crm;
     }
 
-    public String getEspecialidade() {
-        return especialidade;
+    public String getSpecialty() {
+        return specialty;
     }
 
-    public String getClinicaNome() {
-        return clinicaNome;
+    public String getClinicName() {
+        return clinicName;
     }
 
-    public String getEndereco() {
-        return endereco;
+    public String getLocation() {
+        return location;
     }
 
-    public boolean isVisitado() {
-        return visitado;
+    public boolean isVisited() {
+        return visited;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setCrm(String crm) {
         this.crm = crm;
     }
 
-    public void setEspecialidade(String especialidade) {
-        this.especialidade = especialidade;
+    public void setSpecialty(String specialty) {
+        this.specialty = specialty;
     }
 
-    public void setClinicaNome(String clinicaNome) {
-        this.clinicaNome = clinicaNome;
+    public void setClinicName(String clinicName) {
+        this.clinicName = clinicName;
     }
 
-    public void setEndereco(String endereco) {
-        this.endereco = endereco;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public void setVisitado(boolean visitado) {
-        this.visitado = visitado;
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
 }
