@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { Doctor, MOCK_DOCTORS } from '../mocks/docktors';
+import { Doctor } from '../types/doctor';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface Visit {

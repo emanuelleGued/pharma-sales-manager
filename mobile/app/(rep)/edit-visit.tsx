@@ -3,12 +3,12 @@ import {
   View, Text, StyleSheet, 
   TouchableOpacity, TextInput, Alert, ScrollView
 } from 'react-native';
+import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
 import { useVisits } from '../../src/context/VisitContext';
-import { MOCK_DOCTORS } from '../../src/mocks/docktors';
+import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
 
 export default function EditVisitScreen() {
   const insets = useSafeAreaInsets();
@@ -17,11 +17,19 @@ export default function EditVisitScreen() {
   const router = useRouter();
 
   const visit = visits.find((v) => v.id === id);
-  const doctor = MOCK_DOCTORS.find((d) => d.id === visit?.doctorId);
+  const [doctor, setDoctor] = useState<DoctorResponse | null>(null);
 
   const [date, setDate] = useState(visit?.date || '');
   const [time, setTime] = useState(visit?.time || '');
   const [observations, setObservations] = useState(visit?.observations || '');
+
+  useEffect(() => {
+  if (visit?.doctorId) {
+    DoctorService.getDoctorById(visit.doctorId)
+      .then((data) => setDoctor(data))
+      .catch((err) => Alert.alert('Erro', 'Não foi possível carregar os dados do médico.'));
+  }
+}, [visit?.doctorId]);
 
   if (!visit || !doctor) return null;
 
