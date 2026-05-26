@@ -1,15 +1,17 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-  View, Text, StyleSheet, SafeAreaView,
+  View, Text, StyleSheet, 
   TouchableOpacity, TextInput, Alert, ScrollView
 } from 'react-native';
 import { useState, useEffect } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
 import { useVisits } from '../../src/context/VisitContext';
 import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
 
 export default function EditVisitScreen() {
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { visits, updateVisit } = useVisits();
   const router = useRouter();
@@ -42,9 +44,9 @@ export default function EditVisitScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <TouchableOpacity onPress={() => router.push('/(rep)/schedule')}>
           <Feather name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -119,7 +121,7 @@ export default function EditVisitScreen() {
           <Text style={styles.saveText}>Salvar Alterações</Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

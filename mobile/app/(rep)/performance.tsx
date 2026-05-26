@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors } from '../../src/theme/colors';
 import { Header } from '../../src/components/Header';
 import { useRouter } from 'expo-router';
@@ -61,7 +61,7 @@ export default function PerformanceScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Header 
         onProfileClick={() => router.push('../profile')} 
         onNotificationsClick={() => router.push('../notifications')} 
@@ -167,7 +167,7 @@ export default function PerformanceScreen() {
         </View>
 
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

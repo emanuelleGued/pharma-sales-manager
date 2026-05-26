@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
 import { Doctor } from '../../src/mocks/docktors';
@@ -7,6 +8,7 @@ import DoctorService from '../../src/services/DoctorService';
 
 export default function DoctorsScreen() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'Todos' | 'Visitados' | 'Pendentes'>('Todos');
   const [isLoading, setIsLoading] = useState(true);
@@ -70,8 +72,8 @@ export default function DoctorsScreen() {
   const totalCount = doctors.length;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top + 24 }]}>
         <Text style={styles.title}>Base de Médicos</Text>
         <Text style={styles.subtitle}>
           <Text style={styles.visitedCountText}>{visitedCount}</Text> de {totalCount} visitados este mês
@@ -147,7 +149,7 @@ export default function DoctorsScreen() {
           </TouchableOpacity>
         )}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -158,7 +160,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 24,
     paddingBottom: 16,
   },
   title: {

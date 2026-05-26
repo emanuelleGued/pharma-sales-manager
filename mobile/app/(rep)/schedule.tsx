@@ -2,12 +2,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
   Alert,
 } from 'react-native';
 import { useState,useEffect } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import VisitCard from '../../src/components/VisitCard';
@@ -15,10 +15,19 @@ import DoctorService, { DoctorResponse } from '../../src/services/DoctorService'
 import { useVisits } from '../../src/context/VisitContext'; 
 
 export default function ScheduleScreen() {
+  const insets = useSafeAreaInsets();
+  const getLocalDateString = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split('T')[0]
+    getLocalDateString(new Date())
   );
+  const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   const { visits, deleteVisit } = useVisits(); 
   const router = useRouter(); 
   const [doctors, setDoctors] = useState<DoctorResponse[]>([]);
@@ -53,7 +62,7 @@ export default function ScheduleScreen() {
       week.push({
         label: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][d.getDay()],
         day: d.getDate(),
-        date: d.toISOString().split('T')[0],
+        date: getLocalDateString(d),
       });
     }
 
@@ -62,15 +71,45 @@ export default function ScheduleScreen() {
 
   const week = getWeekDays(currentDate);
 
-  const nextWeek = () => {
+  const getMonthDays = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const days = [];
+    for (let i = 0; i < firstDay; i++) {
+      days.push(null);
+    }
+    for (let i = 1; i <= daysInMonth; i++) {
+      const d = new Date(year, month, i);
+      days.push({
+        day: i,
+        date: getLocalDateString(d),
+      });
+    }
+    return days;
+  };
+
+  const monthDays = getMonthDays(currentDate);
+
+  const nextDate = () => {
     const next = new Date(currentDate);
-    next.setDate(currentDate.getDate() + 7);
+    if (viewMode === 'week') {
+      next.setDate(currentDate.getDate() + 7);
+    } else {
+      next.setMonth(currentDate.getMonth() + 1);
+    }
     setCurrentDate(next);
   };
 
-  const prevWeek = () => {
+  const prevDate = () => {
     const prev = new Date(currentDate);
-    prev.setDate(currentDate.getDate() - 7);
+    if (viewMode === 'week') {
+      prev.setDate(currentDate.getDate() - 7);
+    } else {
+      prev.setMonth(currentDate.getMonth() - 1);
+    }
     setCurrentDate(prev);
   };
 
@@ -82,10 +121,9 @@ export default function ScheduleScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* HEADER COM MÊS */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={prevWeek}>
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+        <TouchableOpacity onPress={prevDate}>
           <Text style={styles.arrow}>{'<'}</Text>
         </TouchableOpacity>
 
@@ -96,33 +134,90 @@ export default function ScheduleScreen() {
           })}
         </Text>
 
-        <TouchableOpacity onPress={nextWeek}>
+        <TouchableOpacity onPress={nextDate}>
           <Text style={styles.arrow}>{'>'}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* SEMANA */}
-      <View style={styles.weekContainer}>
-        {week.map((item) => {
-          const isSelected = item.date === selectedDate;
-          return (
-            <TouchableOpacity
-              key={item.date}
-              style={[styles.dayBox, isSelected && styles.selectedDay]}
-              onPress={() => setSelectedDate(item.date)}
-            >
-              <Text style={[styles.dayLabel, isSelected && styles.selectedText]}>
-                {item.label}
-              </Text>
-              <Text style={[styles.dayNumber, isSelected && styles.selectedText]}>
-                {item.day}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+      <View style={styles.toggleContainer}>
+        <TouchableOpacity
+          style={[styles.toggleButton, viewMode === 'week' && styles.toggleButtonActive]}
+          onPress={() => setViewMode('week')}
+        >
+          <Text style={[styles.toggleText, viewMode === 'week' && styles.toggleTextActive]}>Semana</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.toggleButton, viewMode === 'month' && styles.toggleButtonActive]}
+          onPress={() => setViewMode('month')}
+        >
+          <Text style={[styles.toggleText, viewMode === 'month' && styles.toggleTextActive]}>Mês</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* LISTA */}
+      {viewMode === 'week' ? (
+        <View style={styles.weekContainer}>
+          {week.map((item) => {
+            const isSelected = item.date === selectedDate;
+            return (
+              <TouchableOpacity
+                key={item.date}
+                style={[styles.dayBox, isSelected && styles.selectedDay]}
+                onPress={() => setSelectedDate(item.date)}
+              >
+                <Text style={[styles.dayLabel, isSelected && styles.selectedText]}>
+                  {item.label}
+                </Text>
+                <Text style={[styles.dayNumber, isSelected && styles.selectedText]}>
+                  {item.day}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      ) : (
+        <View style={styles.monthContainer}>
+          <View style={styles.monthHeaderRow}>
+            {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => (
+              <Text key={d} style={styles.monthDayHeader}>{d}</Text>
+            ))}
+          </View>
+          <View style={styles.monthGrid}>
+            {monthDays.map((item, index) => {
+              if (!item) return <View key={`empty-${index}`} style={styles.monthDayBox} />;
+              
+              const isSelected = item.date === selectedDate;
+              const isToday = item.date === getLocalDateString(new Date());
+              const hasVisit = (visits || []).some(v => v.date === item.date);
+
+              return (
+                <TouchableOpacity
+                  key={item.date}
+                  style={[
+                    styles.monthDayBox,
+                    isSelected && !isToday && styles.monthSelectedDay,
+                    isToday && styles.monthToday,
+                  ]}
+                  onPress={() => setSelectedDate(item.date)}
+                >
+                  <Text
+                    style={[
+                      styles.monthDayNumber,
+                      isSelected && !isToday && styles.monthSelectedText,
+                      isToday && styles.monthTodayText,
+                    ]}
+                  >
+                    {item.day}
+                  </Text>
+                  {hasVisit && !isToday && (
+                    <View style={styles.visitDot} />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      )}
+
       <View style={styles.listContainer}>
         <ScrollView
           contentContainerStyle={styles.list}
@@ -157,7 +252,7 @@ export default function ScheduleScreen() {
           )}
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -172,7 +267,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginTop: 16,
   },
 
   arrow: {
@@ -239,5 +333,96 @@ const styles = StyleSheet.create({
 
   empty: {
     color: colors.textSecondary,
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    padding: 4,
+    marginHorizontal: 16,
+    marginTop: 16,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  toggleButtonActive: {
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  toggleText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  toggleTextActive: {
+    color: '#C8102E',
+  },
+  monthContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  monthHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  monthDayHeader: {
+    width: '14%',
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#6B7280',
+  },
+  monthGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+  },
+  monthDayBox: {
+    width: '14.28%',
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    marginBottom: 4,
+  },
+  monthSelectedDay: {
+    borderWidth: 2,
+    borderColor: '#C8102E',
+  },
+  monthToday: {
+    backgroundColor: '#00A896',
+  },
+  monthDayNumber: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1F2937',
+  },
+  monthSelectedText: {
+    color: '#C8102E',
+    fontWeight: 'bold',
+  },
+  monthTodayText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  visitDot: {
+    position: 'absolute',
+    bottom: 6,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#C8102E',
   },
 });
