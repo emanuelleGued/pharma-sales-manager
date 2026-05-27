@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback} from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
@@ -11,7 +11,7 @@ export default function DoctorsScreen() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<'Todos' | 'Visitados' | 'Pendentes'>('Todos');
+  const [filter, setFilter] = useState<'Todos' | 'Visitados' | 'Pendentes' | 'Sem Visitas'>('Todos');
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
@@ -63,9 +63,11 @@ export default function DoctorsScreen() {
       const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
   
-      const matchesFilter = filter === 'Todos' ? true :
-                            filter === 'Visitados' ? doc.status === 'VISITADO' :
-                            doc.status !== 'VISITADO'; 
+      const matchesFilter =
+        filter === 'Todos' ? true :
+        filter === 'Visitados' ? doc.status === 'VISITADO' :
+        filter === 'Pendentes' ? doc.status === 'PENDENTE' :
+        doc.status === 'SEM_VISITAS';
   
       return matchesSearch && matchesFilter;
     });
@@ -119,24 +121,30 @@ export default function DoctorsScreen() {
         />
       </View>
 
-      <View style={styles.filterContainer}>
-        {(['Todos', 'Visitados', 'Pendentes'] as const).map(f => (
-          <TouchableOpacity
-            key={f}
-            style={[
-              styles.filterButton,
-              filter === f ? styles.filterButtonActive : styles.filterButtonInactive
-            ]}
-            onPress={() => setFilter(f)}
-          >
-            <Text style={[
-              styles.filterText,
-              filter === f ? styles.filterTextActive : styles.filterTextInactive
-            ]}>
-              {f}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      <View style={styles.filterWrapper}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterContainer}
+        >
+          {(['Todos', 'Visitados', 'Pendentes', 'Sem Visitas'] as const).map(f => (
+            <TouchableOpacity
+              key={f}
+              style={[
+                styles.filterButton,
+                filter === f ? styles.filterButtonActive : styles.filterButtonInactive
+              ]}
+              onPress={() => setFilter(f)}
+            >
+              <Text style={[
+                styles.filterText,
+                filter === f ? styles.filterTextActive : styles.filterTextInactive
+              ]}>
+                {f}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
       <FlatList
@@ -235,10 +243,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
+  filterWrapper: {
+    marginBottom: 20,
+  },
   filterContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 20,
     gap: 8,
   },
   filterButton: {
