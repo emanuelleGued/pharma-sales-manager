@@ -7,17 +7,19 @@ export interface VisitResponse {
   userId: number;
   presentedMaterial?: string;
   date: string;
+  time: string;
   observation?: string;
-  status: 'PENDING' | 'COMPLETED' | 'CANCELED' | 'RESCHEDULED';
+  status: 'AGENDADA' | 'CONCLUIDA' | 'CANCELADA' | 'REAGENDADA';
 }
 
 export interface CreateVisitRequest {
   doctorId: number;
   userId: number;
   date: string;
+  time: string;
   presentedMaterial?: string;
   observation?: string;
-  status: 'PENDING' | 'COMPLETED' | 'CANCELED' | 'RESCHEDULED';
+  status: 'AGENDADA' | 'CONCLUIDA' | 'CANCELADA' | 'REAGENDADA';
 }
 
 class VisitService {
