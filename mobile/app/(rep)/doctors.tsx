@@ -11,7 +11,7 @@ export default function DoctorsScreen() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<'Todos' | 'Visitados' | 'Pendentes' | 'Sem Visitas'>('Todos');
+  const [filter, setFilter] = useState<'Todos' | 'Visitados' | 'Pendentes' | 'Não Agendados'>('Todos');
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
@@ -84,7 +84,7 @@ export default function DoctorsScreen() {
         return { label: 'Pendente', bg: '#FEF3C7', color: '#D97706', icon: 'clock' };
       case 'SEM_VISITAS':
       default:
-        return { label: 'Sem Visitas', bg: '#F1F5F9', color: '#64748B', icon: 'minus' };
+        return { label: 'Não Agendado', bg: '#F1F5F9', color: '#64748B', icon: 'minus' };
     }
   };
 
@@ -127,7 +127,7 @@ export default function DoctorsScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterContainer}
         >
-          {(['Todos', 'Visitados', 'Pendentes', 'Sem Visitas'] as const).map(f => (
+          {(['Todos', 'Visitados', 'Pendentes', 'Não Agendados'] as const).map(f => (
             <TouchableOpacity
               key={f}
               style={[
