@@ -1,8 +1,9 @@
-package com.pharmaSales.repository;
+package com.pharmasales.repository;
 
-import com.pharmaSales.model.Doctor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.pharmasales.model.Doctor;
 
 import java.util.List;
 

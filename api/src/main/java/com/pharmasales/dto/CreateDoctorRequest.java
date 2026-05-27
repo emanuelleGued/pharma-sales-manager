@@ -1,4 +1,4 @@
-package com.pharmaSales.dto;
+package com.pharmasales.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

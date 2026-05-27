@@ -1,8 +1,5 @@
-package com.pharmaSales.controller;
+package com.pharmasales.controller;
 
-import com.pharmaSales.dto.CreateDoctorRequest;
-import com.pharmaSales.dto.DoctorResponse;
-import com.pharmaSales.service.DoctorService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.pharmasales.dto.CreateDoctorRequest;
+import com.pharmasales.dto.DoctorResponse;
+import com.pharmasales.service.DoctorService;
 
 import java.util.List;
 
