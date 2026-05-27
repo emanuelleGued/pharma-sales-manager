@@ -22,4 +22,5 @@ public class VisitResponse {
     private String doctorName;
 
     private Long userId;
+    private String time;
 }

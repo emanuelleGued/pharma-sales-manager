@@ -1,5 +1,6 @@
 package com.pharmasales.config;
 
+import com.pharmasales.model.DoctorStatus;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +37,13 @@ public class DoctorSeeder {
 
     private Doctor build(String name, String crm, String specialty, String clinicName, String location, boolean visited) {
         Doctor doctor = new Doctor(name, crm, specialty, clinicName, location);
-        doctor.setVisited(visited);
+
+        if (visited) {
+            doctor.setStatus(DoctorStatus.VISITADO);
+        } else {
+            doctor.setStatus(DoctorStatus.SEM_VISITAS);
+        }
+
         return doctor;
     }
 }

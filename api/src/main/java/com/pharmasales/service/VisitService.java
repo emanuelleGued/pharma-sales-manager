@@ -3,16 +3,13 @@ package com.pharmasales.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.pharmasales.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.pharmasales.dto.CreateVisitRequest;
 import com.pharmasales.dto.VisitResponse;
-import com.pharmasales.model.Doctor;
-import com.pharmasales.model.User;
-import com.pharmasales.model.Visit;
-import com.pharmasales.model.VisitStatus;
 import com.pharmasales.repository.DoctorRepository;
 import com.pharmasales.repository.UserRepository;
 import com.pharmasales.repository.VisitRepository;
@@ -32,7 +29,8 @@ public class VisitService {
                 visit.getStatus(),
                 visit.getDoctor().getId(),
                 visit.getDoctor().getName(),
-                visit.getUser().getId()
+                visit.getUser().getId(),
+                visit.getTime()
         );
     }
 
@@ -70,6 +68,8 @@ public class VisitService {
 
         Visit savedVisit = visitRepository.save(visit);
 
+        syncDoctorStatus(doctor);
+
         return new VisitResponse(
                 savedVisit.getId(),
                 savedVisit.getDate(),
@@ -77,7 +77,8 @@ public class VisitService {
                 savedVisit.getStatus(),
                 doctor.getId(),
                 doctor.getName(),
-                user.getId()
+                user.getId(),
+                savedVisit.getTime()
         );
     }
 
@@ -87,8 +88,10 @@ public class VisitService {
                     HttpStatus.NOT_FOUND,
                     "Visita não encontrada"
                 ));
+        Doctor doctor = visit.getDoctor();
 
         visitRepository.delete(visit);
+        syncDoctorStatus(doctor);
     }
 
     public List<VisitResponse> listVisit() {
@@ -129,6 +132,8 @@ public class VisitService {
 
         Visit updatedVisit = visitRepository.save(visit);
 
+        syncDoctorStatus(updatedVisit.getDoctor());
+
         return mapToResponse(updatedVisit);
     }
 
@@ -143,6 +148,32 @@ public class VisitService {
 
         Visit updatedVisit = visitRepository.save(visit);
 
+
         return mapToResponse(updatedVisit);
+    }
+
+    private void syncDoctorStatus(Doctor doctor) {
+        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
+        LocalDate endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+
+        List<Visit> monthlyVisits = visitRepository.findMonthlyVisitsByDoctor(doctor.getId(), startOfMonth, endOfMonth);
+
+        DoctorStatus newStatus = DoctorStatus.SEM_VISITAS;
+
+        boolean hasCompleted = monthlyVisits.stream().anyMatch(v -> v.getStatus() == VisitStatus.CONCLUIDA);
+        boolean hasPending = monthlyVisits.stream().anyMatch(v ->
+                v.getStatus() == VisitStatus.AGENDADA || v.getStatus() == VisitStatus.REAGENDADA
+        );
+
+        if (hasCompleted) {
+            newStatus = DoctorStatus.VISITADO;
+        } else if (hasPending) {
+            newStatus = DoctorStatus.PENDENTE;
+        }
+
+        if (doctor.getStatus() != newStatus) {
+            doctor.setStatus(newStatus);
+            doctorRepository.save(doctor);
+        }
     }
 }

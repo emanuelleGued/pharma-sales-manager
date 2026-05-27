@@ -9,7 +9,7 @@ public record DoctorResponse(
         String specialty,
         String clinicName,
         String location,
-        boolean visited
+        String doctorStatus
 ) {
     public static DoctorResponse from(Doctor doctor) {
         return new DoctorResponse(
@@ -19,7 +19,7 @@ public record DoctorResponse(
                 doctor.getSpecialty(),
                 doctor.getClinicName(),
                 doctor.getLocation(),
-                doctor.isVisited()
+                doctor.getStatus().name()
         );
     }
 }

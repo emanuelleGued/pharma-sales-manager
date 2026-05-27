@@ -25,4 +25,6 @@ public class CreateVisitRequest {
 
     @NotNull(message = "O usuário é obrigatório")
     private Long userId;
+
+    private String time;
 }
