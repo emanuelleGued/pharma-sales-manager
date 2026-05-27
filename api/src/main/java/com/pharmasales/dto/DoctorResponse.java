@@ -10,7 +10,7 @@ public record DoctorResponse(
         String specialty,
         String clinicName,
         String location,
-        String doctorStatus
+        String status
 ) {
     public static DoctorResponse from(Doctor doctor) {
         return new DoctorResponse(
