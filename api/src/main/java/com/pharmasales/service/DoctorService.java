@@ -1,12 +1,13 @@
-package com.pharmaSales.service;
+package com.pharmasales.service;
 
-import com.pharmaSales.dto.CreateDoctorRequest;
-import com.pharmaSales.dto.DoctorResponse;
-import com.pharmaSales.model.Doctor;
-import com.pharmaSales.repository.DoctorRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.pharmasales.dto.CreateDoctorRequest;
+import com.pharmasales.dto.DoctorResponse;
+import com.pharmasales.model.Doctor;
+import com.pharmasales.repository.DoctorRepository;
 
 import java.util.List;
 

@@ -19,6 +19,7 @@ import { colors } from '../../src/theme/colors';
 import DoctorService, {DoctorResponse} from '@/src/services/DoctorService';
 import { useVisits } from '../../src/context/VisitContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import VisitService from '@/src/services/VisitService';
 
 export default function NewVisitScreen() {
   const insets = useSafeAreaInsets();
@@ -71,18 +72,18 @@ export default function NewVisitScreen() {
 
   const isFormValid = selectedDoctor && visitDate && visitTime;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedDoctor && visitDate && visitTime) {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       const localDate = `${year}-${month}-${day}`;
-      addVisit({
-        doctorId: selectedDoctor.id, 
+      await VisitService.createVisit({
+        doctorId: Number(selectedDoctor.id),
+        userId: 1,  
         date: localDate,
-        time: visitTime,
-        observations: observations,
-        presentedMaterial: presentedMaterial,
+        observation: observations,
+        status: 'PENDING',
       });
 
       setSelectedDoctor(null);

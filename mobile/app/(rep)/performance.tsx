@@ -1,16 +1,16 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors } from '../../src/theme/colors';
 import { Header } from '../../src/components/Header';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import { useVisits } from '../../src/context/VisitContext';
-import { useState, useEffect } from 'react';
 import DoctorService from '../../src/services/DoctorService';
+import { Visit } from '@/src/context/VisitContext';
+import VisitService from '@/src/services/VisitService';
 
 export default function PerformanceScreen() {
   const router = useRouter();
-  const { visits } = useVisits();
+  const [visits, setVisits] = useState<Visit[]>([]);
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -18,7 +18,7 @@ export default function PerformanceScreen() {
   
   const visitsThisMonth = visits.filter(v => {
     const d = new Date(v.date);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear && v.status === 'completed';
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear && v.status === 'COMPLETED';
   });
   
   const uniqueDoctorsVisited = new Set(visitsThisMonth.map(v => v.doctorId)).size;
@@ -33,7 +33,7 @@ export default function PerformanceScreen() {
   const weeklyVisits = Array(7).fill(0);
   
   visits.forEach(v => {
-    if (v.status === 'completed') {
+    if (v.status === 'COMPLETED') {
       const vDate = new Date(v.date + 'T12:00:00'); 
       const diffTime = vDate.getTime() - startOfWeek.getTime();
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -53,6 +53,19 @@ export default function PerformanceScreen() {
   const daysPassed = today.getDate();
   const projectedVisits = daysPassed > 0 ? Math.round((monthProgress / daysPassed) * daysInMonth) : 0;
   const projectedPercent = Math.round((projectedVisits / monthGoal) * 100);
+
+  useEffect(() => {
+    async function loadVisits() {
+      try {
+        const data = await VisitService.getAllVisits();
+        setVisits(data);
+      } catch (error) {
+        console.error('Erro ao carregar visitas:', error);
+      }
+    }
+
+    loadVisits();
+  }, []);
 
   useEffect(() => {
     DoctorService.getAllDoctors()

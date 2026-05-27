@@ -1,6 +1,6 @@
-package com.pharmaSales.dto;
+package com.pharmasales.dto;
 
-import com.pharmaSales.model.Doctor;
+import com.pharmasales.model.Doctor;
 
 public record DoctorResponse(
         String id,

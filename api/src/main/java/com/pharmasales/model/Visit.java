@@ -1,4 +1,4 @@
-package com.pharmaSales.model;
+package com.pharmasales.model;
 
 import java.time.LocalDate;
 import jakarta.persistence.*;
@@ -22,9 +22,13 @@ public class Visit {
 
     private LocalDate date;
 
-    private String description;
+    private String observation;
 
-    private boolean status;
+    private String time;
+
+    private String presentedMaterial;
+
+    private VisitStatus status;
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")

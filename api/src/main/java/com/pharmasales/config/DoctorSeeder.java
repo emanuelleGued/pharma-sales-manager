@@ -1,10 +1,11 @@
-package com.pharmaSales.config;
+package com.pharmasales.config;
 
-import com.pharmaSales.model.Doctor;
-import com.pharmaSales.repository.DoctorRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.pharmasales.model.Doctor;
+import com.pharmasales.repository.DoctorRepository;
 
 import java.util.List;
 

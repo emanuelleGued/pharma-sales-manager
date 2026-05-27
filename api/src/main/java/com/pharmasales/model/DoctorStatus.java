@@ -1,4 +1,4 @@
-package com.pharmaSales.model;
+package com.pharmasales.model;
 
 public enum DoctorStatus {
     SEM_VISITAS, // nao foi agendado nenhuma visita ainda

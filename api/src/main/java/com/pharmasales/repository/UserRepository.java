@@ -1,8 +1,8 @@
-package com.pharmaSales.repository;
+package com.pharmasales.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.pharmaSales.model.User;
+import com.pharmasales.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 

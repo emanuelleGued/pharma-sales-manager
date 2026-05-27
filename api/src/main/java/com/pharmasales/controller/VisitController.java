@@ -1,9 +1,10 @@
-package com.pharmaSales.controller;
+package com.pharmasales.controller;
 
 import java.time.LocalDate;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,13 +15,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pharmaSales.dto.CreateVisitRequest;
-import com.pharmaSales.dto.UpdateVisitStatusRequest;
-import com.pharmaSales.model.Visit;
-import com.pharmaSales.service.VisitService;
+import com.pharmasales.dto.CreateVisitRequest;
+import com.pharmasales.dto.UpdateVisitStatusRequest;
+import com.pharmasales.dto.VisitResponse;
+import com.pharmasales.service.VisitService;
+
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/visits")
+@CrossOrigin
 public class VisitController {
     private final VisitService visitService;
 
@@ -29,9 +34,9 @@ public class VisitController {
     }
 
     @PostMapping
-    public ResponseEntity<Visit> createVisit(@RequestBody CreateVisitRequest visit) {
-        Visit createdVisit = visitService.createVisit(visit);
-        return ResponseEntity.ok(createdVisit);
+    public ResponseEntity<VisitResponse> createVisit(@Valid @RequestBody CreateVisitRequest visit) {
+        VisitResponse createdVisit = visitService.createVisit(visit);
+        return ResponseEntity.ok(createdVisit); 
     }
 
     @DeleteMapping("/{id}")
@@ -41,26 +46,26 @@ public class VisitController {
     }
     
     @GetMapping("/{date}")
-    public ResponseEntity<List<Visit>> listVisitByDate(@PathVariable LocalDate date){
-        List<Visit> listVisits = visitService.listVisitByDate(date);
+    public ResponseEntity<List<VisitResponse>> listVisitByDate(@PathVariable LocalDate date){
+        List<VisitResponse> listVisits = visitService.listVisitByDate(date);
         return ResponseEntity.ok(listVisits);
     }
 
     @GetMapping
-    public ResponseEntity<List<Visit>> listVisit(){
-        List<Visit> listVisits = visitService.listVisit();
+    public ResponseEntity<List<VisitResponse>> listVisit(){
+        List<VisitResponse> listVisits = visitService.listVisit();
         return ResponseEntity.ok(listVisits);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Visit> updateVisit(@PathVariable Long id, @RequestBody CreateVisitRequest visit){
-        Visit updatedVisit = visitService.updateVisit(id, visit);
+    public ResponseEntity<VisitResponse> updateVisit(@PathVariable Long id,@Valid @RequestBody CreateVisitRequest visit){
+        VisitResponse updatedVisit = visitService.updateVisit(id, visit);
         return ResponseEntity.ok(updatedVisit);
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Visit> updateVisitStatus(@PathVariable Long id, @RequestBody UpdateVisitStatusRequest request){
-        Visit updatedVisit = visitService.updateVisitStatus(id, request.isStatus());
+    public ResponseEntity<VisitResponse> updateVisitStatus(@PathVariable Long id, @RequestBody UpdateVisitStatusRequest request){
+        VisitResponse updatedVisit = visitService.updateVisitStatus(id, request.getStatus());
         return ResponseEntity.ok(updatedVisit);
     }
 }
