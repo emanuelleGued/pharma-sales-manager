@@ -18,7 +18,7 @@ export default function PerformanceScreen() {
   
   const visitsThisMonth = visits.filter(v => {
     const d = new Date(v.date);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear && v.status === 'COMPLETED';
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear && v.status === 'CONCLUIDA';
   });
   
   const uniqueDoctorsVisited = new Set(visitsThisMonth.map(v => v.doctorId)).size;
@@ -33,7 +33,7 @@ export default function PerformanceScreen() {
   const weeklyVisits = Array(7).fill(0);
   
   visits.forEach(v => {
-    if (v.status === 'COMPLETED') {
+    if (v.status === 'CONCLUIDA') {
       const vDate = new Date(v.date + 'T12:00:00'); 
       const diffTime = vDate.getTime() - startOfWeek.getTime();
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));

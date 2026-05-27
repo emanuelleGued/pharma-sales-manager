@@ -40,10 +40,10 @@ export default function ScheduleScreen() {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'completed': return 'Realizada';
-      case 'canceled': return 'Cancelada';
-      case 'rescheduled': return 'Reagendada';
-      default: return 'Pendente';
+      case 'CONCLUIDA': return 'Realizada';
+      case 'CANCELADA': return 'Cancelada';
+      case 'REAGENDADA': return 'Reagendada';
+      default: return 'Pendente'; // AGENDADA
     }
   };
 
@@ -116,7 +116,7 @@ export default function ScheduleScreen() {
   const filteredVisits = (visits || [])
     .filter((visit) => visit.date === selectedDate)
     .map((visit) => {
-      const doctor = doctors.find((doc) => doc.id === visit.doctorId);
+      const doctor = doctors.find((doc) => String(doc.id) === String(visit.doctorId));
       return { ...visit, doctor };
   });
 

@@ -41,9 +41,9 @@ export default function VisitDetailsScreen() {
 
   const handleSubmit = () => {
     let message = 'Visita atualizada com sucesso!';
-    if (selectedResult === 'completed') message = 'Visita concluída com sucesso!';
-    else if (selectedResult === 'rescheduled') message = 'Visita reagendada!';
-    else if (selectedResult === 'canceled') message = 'Visita cancelada!';
+    if (selectedResult === 'CONCLUIDA') message = 'Visita concluída com sucesso!';
+    else if (selectedResult === 'REAGENDADA') message = 'Visita reagendada!';
+    else if (selectedResult === 'CANCELADA') message = 'Visita cancelada!';
 
     if (visit && selectedResult) {
       updateVisit(visit.id, {
@@ -126,7 +126,7 @@ export default function VisitDetailsScreen() {
           ))}
         </View>
 
-        {selectedResult === 'completed' && (
+        {selectedResult === 'CONCLUIDA' && (
           <View style={styles.goalCard}>
             <View style={styles.goalTextContainer}>
               <Text style={styles.goalTitle}>Meta atingida nesta visita?</Text>

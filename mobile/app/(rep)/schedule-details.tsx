@@ -14,14 +14,14 @@ export default function ScheduleDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { visits = [], deleteVisit } = useVisits();
 
-  const visit = visits.find((v) => v.id === id);
+  const visit = visits.find((v) => String(v.id) === String(id));
   const [doctor, setDoctor] = useState<DoctorResponse | null>(null);
 
   useEffect(() => {
     if (visit?.doctorId) {
       DoctorService.getAllDoctors()
         .then((docs) => {
-          const found = docs.find((d) => d.id === visit.doctorId);
+          const found = docs.find((d) => String(d.id) === String(visit.doctorId));
           if (found) setDoctor(found);
         })
         .catch((err) => console.error('Erro ao buscar médico do agendamento:', err));
