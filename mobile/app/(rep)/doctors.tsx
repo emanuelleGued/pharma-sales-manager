@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback} from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
 import { Doctor } from '../../src/types/doctor';
 import DoctorService from '../../src/services/DoctorService';
+import { useFocusEffect } from 'expo-router';
 
 export default function DoctorsScreen() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -14,9 +15,11 @@ export default function DoctorsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
-  useEffect(() => {
-    loadDoctors();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadDoctors();
+    }, [])
+  );
 
   const loadDoctors = async () => {
     try {
@@ -58,18 +61,30 @@ export default function DoctorsScreen() {
   const filteredDoctors = useMemo(() => {
     return doctors.filter(doc => {
       const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-
+                            doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+  
       const matchesFilter = filter === 'Todos' ? true :
-        filter === 'Visitados' ? doc.visited :
-          !doc.visited;
-
+                            filter === 'Visitados' ? doc.status === 'VISITADO' :
+                            doc.status !== 'VISITADO'; 
+  
       return matchesSearch && matchesFilter;
     });
   }, [doctors, searchQuery, filter]);
-
-  const visitedCount = doctors.filter(d => d.visited).length;
+  
+  const visitedCount = doctors.filter(d => d.status === 'VISITADO').length;
   const totalCount = doctors.length;
+
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case 'VISITADO':
+        return { label: 'Visitado', bg: '#E6F6F4', color: '#00A896', icon: 'check-circle' };
+      case 'PENDENTE':
+        return { label: 'Pendente', bg: '#FEF3C7', color: '#D97706', icon: 'clock' };
+      case 'SEM_VISITAS':
+      default:
+        return { label: 'Sem Visitas', bg: '#F1F5F9', color: '#64748B', icon: 'minus' };
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -140,11 +155,15 @@ export default function DoctorsScreen() {
               <Text style={styles.doctorClinic}>{item.clinicName} • {item.location}</Text>
             </View>
             <View style={styles.checkButton}>
-              {item.visited ? (
-                <View style={styles.circleVisited} />
-              ) : (
-                <View style={styles.circlePending} />
-              )}
+              {(() => {
+                const config = getStatusConfig(item.status);
+                return (
+                  <View style={[styles.badge, { backgroundColor: config.bg }]}>
+                    <Feather name={config.icon as any} size={12} color={config.color} style={{ marginRight: 4 }} />
+                    <Text style={[styles.badgeText, { color: config.color }]}>{config.label}</Text>
+                  </View>
+                );
+              })()}
             </View>
           </TouchableOpacity>
         )}
@@ -304,5 +323,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#CBD5E1',
     backgroundColor: colors.background,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: 'bold',
   },
 });
