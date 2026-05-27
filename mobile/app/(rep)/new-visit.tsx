@@ -80,10 +80,12 @@ export default function NewVisitScreen() {
       const localDate = `${year}-${month}-${day}`;
       await VisitService.createVisit({
         doctorId: Number(selectedDoctor.id),
-        userId: 1,  
+        userId: 1,
         date: localDate,
+        time: visitTime,
         observation: observations,
-        status: 'PENDING',
+        presentedMaterial,
+        status: 'AGENDADA',
       });
 
       setSelectedDoctor(null);

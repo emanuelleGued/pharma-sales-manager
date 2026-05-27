@@ -61,6 +61,7 @@ public class VisitService {
         Visit visit = new Visit();
 
         visit.setDate(request.getDate());
+        visit.setTime(request.getTime());
         visit.setObservation(request.getObservation());
         visit.setStatus(request.getStatus());
         visit.setDoctor(doctor);
@@ -125,6 +126,7 @@ public class VisitService {
                     "Usuário não encontrado"));
 
         visit.setDate(request.getDate());
+        visit.setTime(request.getTime());
         visit.setObservation(request.getObservation());
         visit.setStatus(request.getStatus());
         visit.setDoctor(doctor);

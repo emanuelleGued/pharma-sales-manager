@@ -26,6 +26,7 @@ public class Doctor {
     private String location;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private DoctorStatus status = DoctorStatus.SEM_VISITAS;
 
     protected Doctor() {

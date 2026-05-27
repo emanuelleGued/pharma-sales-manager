@@ -1,6 +1,7 @@
 package com.pharmasales.dto;
 
 import com.pharmasales.model.Doctor;
+import com.pharmasales.model.DoctorStatus;
 
 public record DoctorResponse(
         String id,
@@ -19,7 +20,7 @@ public record DoctorResponse(
                 doctor.getSpecialty(),
                 doctor.getClinicName(),
                 doctor.getLocation(),
-                doctor.getStatus().name()
+                (doctor.getStatus() != null ? doctor.getStatus() : DoctorStatus.SEM_VISITAS).name()
         );
     }
 }
