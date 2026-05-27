@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -16,9 +16,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../../src/theme/colors';
-import { MOCK_DOCTORS, Doctor } from '../../src/mocks/docktors';
+import DoctorService, {DoctorResponse} from '@/src/services/DoctorService';
 import { useVisits } from '../../src/context/VisitContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import VisitService from '@/src/services/VisitService';
 
 export default function NewVisitScreen() {
   const insets = useSafeAreaInsets();
@@ -27,7 +28,7 @@ export default function NewVisitScreen() {
   const isEditMode = params.editMode === 'true';
   const { addVisit } = useVisits();
 
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [selectedDoctor, setSelectedDoctor] = useState<DoctorResponse | null>(null);
   const [visitDate, setVisitDate] = useState('');
   const [visitTime, setVisitTime] = useState('');
   const [observations, setObservations] = useState('');
@@ -39,6 +40,13 @@ export default function NewVisitScreen() {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [doctors, setDoctors] = useState<DoctorResponse[]>([]);
+
+  useEffect(() => {
+    DoctorService.getAllDoctors()
+      .then((data) => setDoctors(data))
+      .catch((err) => console.error('Erro ao carregar médicos para o formulário:', err));
+  }, []);
 
   const formatDate = (date: Date) => {
     return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
@@ -64,18 +72,18 @@ export default function NewVisitScreen() {
 
   const isFormValid = selectedDoctor && visitDate && visitTime;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedDoctor && visitDate && visitTime) {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       const localDate = `${year}-${month}-${day}`;
-      addVisit({
-        doctorId: selectedDoctor.id, 
+      await VisitService.createVisit({
+        doctorId: Number(selectedDoctor.id),
+        userId: 1,  
         date: localDate,
-        time: visitTime,
-        observations: observations,
-        presentedMaterial: presentedMaterial,
+        observation: observations,
+        status: 'PENDING',
       });
 
       setSelectedDoctor(null);
@@ -93,7 +101,7 @@ export default function NewVisitScreen() {
     }
   };
 
-  const renderDoctorItem = ({ item }: { item: Doctor }) => (
+  const renderDoctorItem = ({ item }: { item: DoctorResponse }) => (
     <TouchableOpacity 
       style={styles.doctorCard} 
       onPress={() => {
@@ -298,7 +306,7 @@ export default function NewVisitScreen() {
               </View>
               
               <FlatList
-                data={MOCK_DOCTORS}
+                data={doctors}
                 keyExtractor={(item) => item.id}
                 renderItem={renderDoctorItem}
                 contentContainerStyle={styles.modalList}

@@ -1,85 +1,209 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { Doctor, MOCK_DOCTORS } from '../mocks/docktors';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from 'react';
+
+import { Doctor } from '../types/doctor';
+
+import VisitService, {
+  CreateVisitRequest,
+  VisitResponse,
+} from '../services/VisitService';
 
 export interface Visit {
-  id: string;
-  doctorId: string;
+  id: number;
+  doctorId: number;
   doctor?: Doctor;
+  doctorName?: string;
+  userId: number;
   date: string;
-  time: string;
   observations?: string;
   presentedMaterial?: string;
-  status: 'scheduled' | 'completed' | 'canceled' | 'rescheduled';
+  status:
+    | 'PENDING'
+    | 'COMPLETED'
+    | 'CANCELED'
+    | 'RESCHEDULED';
 }
 
 interface VisitContextData {
   visits: Visit[];
-  addVisit: (visit: Omit<Visit, 'id' | 'status'>) => void;
-  updateVisit: (updated: Visit) => void;
-  deleteVisit: (id: string) => void;
+  loading: boolean;
+
+  loadVisits: () => Promise<void>;
+
+  addVisit: (
+    visit: CreateVisitRequest
+  ) => Promise<void>;
+
+  updateVisit: (
+    id: number,
+    visit: CreateVisitRequest
+  ) => Promise<void>;
+
+  deleteVisit: (
+    id: number
+  ) => Promise<void>;
 }
 
-const VisitContext = createContext<VisitContextData>({} as VisitContextData);
-const VISITS_STORAGE_KEY = '@pharma_visits';
+const VisitContext =
+  createContext<VisitContextData>(
+    {} as VisitContextData
+  );
 
-export function VisitProvider({ children }: { children: ReactNode }) {
-  const [visits, setVisits] = useState<Visit[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+function mapVisitResponseToVisit(
+  visit: VisitResponse
+): Visit {
+  return {
+    id: visit.id,
+    doctorId: visit.doctorId,
+    doctorName: visit.doctorName,
+    userId: visit.userId,
+    date: visit.date,
+    observations: visit.observation,
+    presentedMaterial:
+      visit.presentedMaterial,
+    status: visit.status,
+  };
+}
 
-  // Carregar as visitas salvas na inicialização
-  useEffect(() => {
-    async function loadVisits() {
-      try {
-        const storedVisits = await AsyncStorage.getItem(VISITS_STORAGE_KEY);
-        if (storedVisits) {
-          setVisits(JSON.parse(storedVisits));
-        }
-      } catch (error) {
-        console.error('Erro ao carregar as visitas do AsyncStorage:', error);
-      } finally {
-        setIsLoaded(true);
-      }
+export function VisitProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [visits, setVisits] = useState<
+    Visit[]
+  >([]);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  async function loadVisits() {
+    try {
+      setLoading(true);
+
+      const response =
+        await VisitService.getAllVisits();
+
+      const formattedVisits =
+        response.map(
+          mapVisitResponseToVisit
+        );
+
+      setVisits(formattedVisits);
+    } catch (error) {
+      console.error(
+        'Erro ao carregar visitas:',
+        error
+      );
+    } finally {
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
     loadVisits();
   }, []);
 
+  async function addVisit(
+    visitData: CreateVisitRequest
+  ) {
+    try {
+      const createdVisit =
+        await VisitService.createVisit(
+          visitData
+        );
 
-  useEffect(() => {
-    async function saveVisits() {
-      if (isLoaded) {
-        try {
-          await AsyncStorage.setItem(VISITS_STORAGE_KEY, JSON.stringify(visits));
-        } catch (error) {
-          console.error('Erro ao salvar as visitas no AsyncStorage:', error);
-        }
-      }
+      const formattedVisit =
+        mapVisitResponseToVisit(
+          createdVisit
+        );
+
+      setVisits((prev) => [
+        formattedVisit,
+        ...prev,
+      ]);
+    } catch (error) {
+      console.error(
+        'Erro ao criar visita:',
+        error
+      );
+
+      throw error;
     }
-    saveVisits();
-  }, [visits, isLoaded]);
+  }
 
-  const addVisit = (visitData: Omit<Visit, 'id' | 'status'>) => {
-    const newVisit: Visit = {
-      ...visitData,
-      id: Math.random().toString(36).substring(2, 9),
-      status: 'scheduled',
-    };
-    setVisits((prev) => [newVisit, ...prev]);
-  };
+  async function updateVisit(
+    id: number,
+    visitData: CreateVisitRequest
+  ) {
+    try {
+      const updatedVisit =
+        await VisitService.updateVisit(
+          id,
+          visitData
+        );
 
-  const updateVisit = (updated: Visit) => {
-    setVisits((prev) => prev.map((v) => (v.id === updated.id ? updated : v)));
-  };
+      const formattedVisit =
+        mapVisitResponseToVisit(
+          updatedVisit
+        );
 
-  const deleteVisit = (id: string) => {
-    setVisits((prev) => prev.filter((v) => v.id !== id));
-  };
+      setVisits((prev) =>
+        prev.map((visit) =>
+          visit.id === id
+            ? formattedVisit
+            : visit
+        )
+      );
+    } catch (error) {
+      console.error(
+        'Erro ao atualizar visita:',
+        error
+      );
+
+      throw error;
+    }
+  }
+
+  async function deleteVisit(id: number) {
+    try {
+      await VisitService.deleteVisit(id);
+
+      setVisits((prev) =>
+        prev.filter(
+          (visit) => visit.id !== id
+        )
+      );
+    } catch (error) {
+      console.error(
+        'Erro ao deletar visita:',
+        error
+      );
+
+      throw error;
+    }
+  }
 
   return (
-    <VisitContext.Provider value={{ visits, addVisit, updateVisit, deleteVisit }}>
+    <VisitContext.Provider
+      value={{
+        visits,
+        loading,
+        loadVisits,
+        addVisit,
+        updateVisit,
+        deleteVisit,
+      }}
+    >
       {children}
     </VisitContext.Provider>
   );
 }
 
-export const useVisits = () => useContext(VisitContext);
+export const useVisits = () =>
+  useContext(VisitContext);

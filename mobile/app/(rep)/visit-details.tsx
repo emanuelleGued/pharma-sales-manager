@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Switch } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import { useVisits } from '../../src/context/VisitContext';
-import { MOCK_DOCTORS } from '../../src/mocks/docktors';
+import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
 
 export default function VisitDetailsScreen() {
   const insets = useSafeAreaInsets();
@@ -15,7 +15,18 @@ export default function VisitDetailsScreen() {
   
   const { visits, updateVisit } = useVisits();
   const visit = visits.find(v => v.id === id);
-  const doctor = MOCK_DOCTORS.find(d => d.id === visit?.doctorId);
+  const [doctor, setDoctor] = useState<DoctorResponse | null>(null);
+
+  useEffect(() => {
+    if (visit?.doctorId) {
+      DoctorService.getAllDoctors()
+        .then((docs) => {
+          const found = docs.find((d) => d.id === visit.doctorId);
+          if (found) setDoctor(found);
+        })
+        .catch((err) => console.error('Erro ao carregar dados do médico para conclusão:', err));
+    }
+  }, [visit?.doctorId]);
 
   const [selectedResult, setSelectedResult] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
