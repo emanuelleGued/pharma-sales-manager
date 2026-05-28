@@ -20,13 +20,10 @@ export interface Visit {
   doctorName?: string;
   userId: number;
   date: string;
+  time: string; 
   observations?: string;
   presentedMaterial?: string;
-  status:
-    | 'PENDING'
-    | 'COMPLETED'
-    | 'CANCELED'
-    | 'RESCHEDULED';
+  status: 'AGENDADA' | 'CONCLUIDA' | 'CANCELADA' | 'REAGENDADA'; 
 }
 
 interface VisitContextData {
@@ -54,21 +51,19 @@ const VisitContext =
     {} as VisitContextData
   );
 
-function mapVisitResponseToVisit(
-  visit: VisitResponse
-): Visit {
-  return {
-    id: visit.id,
-    doctorId: visit.doctorId,
-    doctorName: visit.doctorName,
-    userId: visit.userId,
-    date: visit.date,
-    observations: visit.observation,
-    presentedMaterial:
-      visit.presentedMaterial,
-    status: visit.status,
-  };
-}
+  function mapVisitResponseToVisit(visit: VisitResponse): Visit {
+    return {
+      id: visit.id,
+      doctorId: visit.doctorId,
+      doctorName: visit.doctorName,
+      userId: visit.userId,
+      date: visit.date,
+      time: visit.time, 
+      observations: visit.observation,
+      presentedMaterial: visit.presentedMaterial,
+      status: visit.status,
+    };
+  }
 
 export function VisitProvider({
   children,

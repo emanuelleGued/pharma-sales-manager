@@ -16,7 +16,7 @@ export interface DoctorResponse {
   specialty: string;
   clinicName: string;
   location: string;
-  visited: boolean;
+  status: 'SEM_VISITAS' | 'PENDENTE' | 'VISITADO';
 }
 
 export interface CreateDoctorRequest {

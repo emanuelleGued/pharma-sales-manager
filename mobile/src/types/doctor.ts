@@ -5,5 +5,5 @@ export type Doctor = {
   specialty: string;
   location: string;
   clinicName: string;
-  visited: boolean;
+  status: 'SEM_VISITAS' | 'PENDENTE' | 'VISITADO';
 };
