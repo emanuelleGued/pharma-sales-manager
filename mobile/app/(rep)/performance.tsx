@@ -4,6 +4,7 @@ import { colors } from '../../src/theme/colors';
 import { Header } from '../../src/components/Header';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import DoctorService from '../../src/services/DoctorService';
 import { Visit } from '@/src/context/VisitContext';
 import VisitService from '@/src/services/VisitService';
@@ -11,6 +12,7 @@ import VisitService from '@/src/services/VisitService';
 export default function PerformanceScreen() {
   const router = useRouter();
   const [visits, setVisits] = useState<Visit[]>([]);
+  const tabBarHeight = useBottomTabBarHeight();
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -79,7 +81,7 @@ export default function PerformanceScreen() {
         onProfileClick={() => router.push('../profile')} 
         onNotificationsClick={() => router.push('../notifications')} 
       />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]} showsVerticalScrollIndicator={false}>
         
         {/* Base de Médicos */}
         <View style={styles.baseCard}>
@@ -186,7 +188,7 @@ export default function PerformanceScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { padding: 20, paddingBottom: 100 },
+  scrollContent: { padding: 20 },
   
   baseCard: {
     backgroundColor: '#991B1B', 

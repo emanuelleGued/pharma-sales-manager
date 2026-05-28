@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback} from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
 import { Doctor } from '../../src/types/doctor';
@@ -10,6 +11,7 @@ import { useFocusEffect } from 'expo-router';
 export default function DoctorsScreen() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'Todos' | 'Visitados' | 'Pendentes' | 'Não Agendados'>('Todos');
   const [isLoading, setIsLoading] = useState(true);
@@ -150,7 +152,7 @@ export default function DoctorsScreen() {
       <FlatList
         data={filteredDoctors}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 24 }]}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -280,7 +282,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
-    paddingBottom: 100,
     gap: 12,
   },
   doctorCard: {

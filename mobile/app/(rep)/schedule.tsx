@@ -8,14 +8,16 @@ import {
 } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import VisitCard from '../../src/components/VisitCard';
 import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
-import { useVisits } from '../../src/context/VisitContext'; 
+import { useVisits } from '../../src/context/VisitContext';
 
 export default function ScheduleScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const getLocalDateString = (d: Date) => {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -122,108 +124,107 @@ export default function ScheduleScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <TouchableOpacity onPress={prevDate}>
-          <Text style={styles.arrow}>{'<'}</Text>
-        </TouchableOpacity>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+          <TouchableOpacity onPress={prevDate}>
+            <Text style={styles.arrow}>{'<'}</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.monthText}>
-          {currentDate.toLocaleDateString('pt-BR', {
-            month: 'long',
-            year: 'numeric',
-          })}
-        </Text>
+          <Text style={styles.monthText}>
+            {currentDate.toLocaleDateString('pt-BR', {
+              month: 'long',
+              year: 'numeric',
+            })}
+          </Text>
 
-        <TouchableOpacity onPress={nextDate}>
-          <Text style={styles.arrow}>{'>'}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.toggleContainer}>
-        <TouchableOpacity
-          style={[styles.toggleButton, viewMode === 'week' && styles.toggleButtonActive]}
-          onPress={() => setViewMode('week')}
-        >
-          <Text style={[styles.toggleText, viewMode === 'week' && styles.toggleTextActive]}>Semana</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.toggleButton, viewMode === 'month' && styles.toggleButtonActive]}
-          onPress={() => setViewMode('month')}
-        >
-          <Text style={[styles.toggleText, viewMode === 'month' && styles.toggleTextActive]}>Mês</Text>
-        </TouchableOpacity>
-      </View>
-
-      {viewMode === 'week' ? (
-        <View style={styles.weekContainer}>
-          {week.map((item) => {
-            const isSelected = item.date === selectedDate;
-            return (
-              <TouchableOpacity
-                key={item.date}
-                style={[styles.dayBox, isSelected && styles.selectedDay]}
-                onPress={() => setSelectedDate(item.date)}
-              >
-                <Text style={[styles.dayLabel, isSelected && styles.selectedText]}>
-                  {item.label}
-                </Text>
-                <Text style={[styles.dayNumber, isSelected && styles.selectedText]}>
-                  {item.day}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+          <TouchableOpacity onPress={nextDate}>
+            <Text style={styles.arrow}>{'>'}</Text>
+          </TouchableOpacity>
         </View>
-      ) : (
-        <View style={styles.monthContainer}>
-          <View style={styles.monthHeaderRow}>
-            {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => (
-              <Text key={d} style={styles.monthDayHeader}>{d}</Text>
-            ))}
-          </View>
-          <View style={styles.monthGrid}>
-            {monthDays.map((item, index) => {
-              if (!item) return <View key={`empty-${index}`} style={styles.monthDayBox} />;
-              
-              const isSelected = item.date === selectedDate;
-              const isToday = item.date === getLocalDateString(new Date());
-              const hasVisit = (visits || []).some(v => v.date === item.date);
 
+        <View style={styles.toggleContainer}>
+          <TouchableOpacity
+            style={[styles.toggleButton, viewMode === 'week' && styles.toggleButtonActive]}
+            onPress={() => setViewMode('week')}
+          >
+            <Text style={[styles.toggleText, viewMode === 'week' && styles.toggleTextActive]}>Semana</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleButton, viewMode === 'month' && styles.toggleButtonActive]}
+            onPress={() => setViewMode('month')}
+          >
+            <Text style={[styles.toggleText, viewMode === 'month' && styles.toggleTextActive]}>Mês</Text>
+          </TouchableOpacity>
+        </View>
+
+        {viewMode === 'week' ? (
+          <View style={styles.weekContainer}>
+            {week.map((item) => {
+              const isSelected = item.date === selectedDate;
               return (
                 <TouchableOpacity
                   key={item.date}
-                  style={[
-                    styles.monthDayBox,
-                    isSelected && !isToday && styles.monthSelectedDay,
-                    isToday && styles.monthToday,
-                  ]}
+                  style={[styles.dayBox, isSelected && styles.selectedDay]}
                   onPress={() => setSelectedDate(item.date)}
                 >
-                  <Text
-                    style={[
-                      styles.monthDayNumber,
-                      isSelected && !isToday && styles.monthSelectedText,
-                      isToday && styles.monthTodayText,
-                    ]}
-                  >
+                  <Text style={[styles.dayLabel, isSelected && styles.selectedText]}>
+                    {item.label}
+                  </Text>
+                  <Text style={[styles.dayNumber, isSelected && styles.selectedText]}>
                     {item.day}
                   </Text>
-                  {hasVisit && !isToday && (
-                    <View style={styles.visitDot} />
-                  )}
                 </TouchableOpacity>
               );
             })}
           </View>
-        </View>
-      )}
+        ) : (
+          <View style={styles.monthContainer}>
+            <View style={styles.monthHeaderRow}>
+              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => (
+                <Text key={d} style={styles.monthDayHeader}>{d}</Text>
+              ))}
+            </View>
+            <View style={styles.monthGrid}>
+              {monthDays.map((item, index) => {
+                if (!item) return <View key={`empty-${index}`} style={styles.monthDayBox} />;
 
-      <View style={styles.listContainer}>
-        <ScrollView
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          style={{ overflow: 'visible' }}
-        >
+                const isSelected = item.date === selectedDate;
+                const isToday = item.date === getLocalDateString(new Date());
+                const hasVisit = (visits || []).some(v => v.date === item.date);
+
+                return (
+                  <TouchableOpacity
+                    key={item.date}
+                    style={[
+                      styles.monthDayBox,
+                      isSelected && !isToday && styles.monthSelectedDay,
+                      isToday && styles.monthToday,
+                    ]}
+                    onPress={() => setSelectedDate(item.date)}
+                  >
+                    <Text
+                      style={[
+                        styles.monthDayNumber,
+                        isSelected && !isToday && styles.monthSelectedText,
+                        isToday && styles.monthTodayText,
+                      ]}
+                    >
+                      {item.day}
+                    </Text>
+                    {hasVisit && !isToday && (
+                      <View style={styles.visitDot} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
+        <View style={styles.listSection}>
           <Text style={styles.title}>
             Visitas do dia ({filteredVisits.length})
           </Text>
@@ -250,8 +251,8 @@ export default function ScheduleScreen() {
           ) : (
             <Text style={styles.empty}>Nenhuma visita</Text>
           )}
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -260,6 +261,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
 
   header: {
@@ -314,14 +318,9 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 
-  list: {
+  listSection: {
     padding: 16,
-    overflow: 'visible',
-  },
-
-  listContainer: {
-    flex: 1,
-    overflow: 'visible',
+    paddingTop: 24,
   },
 
   title: {
