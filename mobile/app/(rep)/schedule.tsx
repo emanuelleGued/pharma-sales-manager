@@ -122,101 +122,105 @@ export default function ScheduleScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <TouchableOpacity onPress={prevDate}>
-          <Text style={styles.arrow}>{'<'}</Text>
-        </TouchableOpacity>
+      <View style={styles.calendarWrapper}>
+        <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+          <TouchableOpacity onPress={prevDate}>
+            <Text style={styles.arrow}>{'<'}</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.monthText}>
-          {currentDate.toLocaleDateString('pt-BR', {
-            month: 'long',
-            year: 'numeric',
-          })}
-        </Text>
+          <Text style={styles.monthText}>
+            {currentDate.toLocaleDateString('pt-BR', {
+              month: 'long',
+              year: 'numeric',
+            })}
+          </Text>
 
-        <TouchableOpacity onPress={nextDate}>
-          <Text style={styles.arrow}>{'>'}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.toggleContainer}>
-        <TouchableOpacity
-          style={[styles.toggleButton, viewMode === 'week' && styles.toggleButtonActive]}
-          onPress={() => setViewMode('week')}
-        >
-          <Text style={[styles.toggleText, viewMode === 'week' && styles.toggleTextActive]}>Semana</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.toggleButton, viewMode === 'month' && styles.toggleButtonActive]}
-          onPress={() => setViewMode('month')}
-        >
-          <Text style={[styles.toggleText, viewMode === 'month' && styles.toggleTextActive]}>Mês</Text>
-        </TouchableOpacity>
-      </View>
-
-      {viewMode === 'week' ? (
-        <View style={styles.weekContainer}>
-          {week.map((item) => {
-            const isSelected = item.date === selectedDate;
-            return (
-              <TouchableOpacity
-                key={item.date}
-                style={[styles.dayBox, isSelected && styles.selectedDay]}
-                onPress={() => setSelectedDate(item.date)}
-              >
-                <Text style={[styles.dayLabel, isSelected && styles.selectedText]}>
-                  {item.label}
-                </Text>
-                <Text style={[styles.dayNumber, isSelected && styles.selectedText]}>
-                  {item.day}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+          <TouchableOpacity onPress={nextDate}>
+            <Text style={styles.arrow}>{'>'}</Text>
+          </TouchableOpacity>
         </View>
-      ) : (
-        <View style={styles.monthContainer}>
-          <View style={styles.monthHeaderRow}>
-            {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => (
-              <Text key={d} style={styles.monthDayHeader}>{d}</Text>
-            ))}
-          </View>
-          <View style={styles.monthGrid}>
-            {monthDays.map((item, index) => {
-              if (!item) return <View key={`empty-${index}`} style={styles.monthDayBox} />;
-              
-              const isSelected = item.date === selectedDate;
-              const isToday = item.date === getLocalDateString(new Date());
-              const hasVisit = (visits || []).some(v => v.date === item.date);
 
+        <View style={styles.toggleContainer}>
+          <TouchableOpacity
+            style={[styles.toggleButton, viewMode === 'week' && styles.toggleButtonActive]}
+            onPress={() => setViewMode('week')}
+          >
+            <Text style={[styles.toggleText, viewMode === 'week' && styles.toggleTextActive]}>Semana</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleButton, viewMode === 'month' && styles.toggleButtonActive]}
+            onPress={() => setViewMode('month')}
+          >
+            <Text style={[styles.toggleText, viewMode === 'month' && styles.toggleTextActive]}>Mês</Text>
+          </TouchableOpacity>
+        </View>
+
+        {viewMode === 'week' ? (
+          <View style={styles.weekContainer}>
+            {week.map((item) => {
+              const isSelected = item.date === selectedDate;
               return (
                 <TouchableOpacity
                   key={item.date}
-                  style={[
-                    styles.monthDayBox,
-                    isSelected && !isToday && styles.monthSelectedDay,
-                    isToday && styles.monthToday,
-                  ]}
+                  style={[styles.dayBox, isSelected && styles.selectedDay]}
                   onPress={() => setSelectedDate(item.date)}
                 >
-                  <Text
-                    style={[
-                      styles.monthDayNumber,
-                      isSelected && !isToday && styles.monthSelectedText,
-                      isToday && styles.monthTodayText,
-                    ]}
-                  >
+                  <Text style={[styles.dayLabel, isSelected && styles.selectedText]}>
+                    {item.label}
+                  </Text>
+                  <Text style={[styles.dayNumber, isSelected && styles.selectedText]}>
                     {item.day}
                   </Text>
-                  {hasVisit && !isToday && (
-                    <View style={styles.visitDot} />
-                  )}
                 </TouchableOpacity>
               );
             })}
           </View>
-        </View>
-      )}
+        ) : (
+          <View style={styles.monthContainer}>
+            <View style={styles.monthHeaderRow}>
+              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => (
+                <Text key={d} style={styles.monthDayHeader}>{d}</Text>
+              ))}
+            </View>
+            <View style={styles.monthGrid}>
+              {monthDays.map((item, index) => {
+                if (!item) return <View key={`empty-${index}`} style={styles.monthDayBox} />;
+                
+                const isSelected = item.date === selectedDate;
+                const isToday = item.date === getLocalDateString(new Date());
+                const hasVisit = (visits || []).some(v => v.date === item.date);
+
+                return (
+                  <TouchableOpacity
+                    key={item.date}
+                    style={[
+                      styles.monthDayBox,
+                      isSelected && !isToday && styles.monthSelectedDay,
+                      isToday && styles.monthToday,
+                    ]}
+                    onPress={() => setSelectedDate(item.date)}
+                  >
+                    <Text
+                      style={[
+                        styles.monthDayNumber,
+                        isSelected && !isToday && styles.monthSelectedText,
+                        isToday && styles.monthTodayText,
+                      ]}
+                    >
+                      {item.day}
+                    </Text>
+                    {hasVisit && !isToday && (
+                      <View style={styles.visitDot} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        )}
+      </View>
+
+
 
       <View style={styles.listContainer}>
         <ScrollView
@@ -260,6 +264,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  calendarWrapper: {
+    zIndex: 10,
+    backgroundColor: colors.background,
+    paddingBottom: 8,
   },
 
   header: {
@@ -316,6 +325,7 @@ const styles = StyleSheet.create({
 
   list: {
     padding: 16,
+    paddingBottom: 100,
     overflow: 'visible',
   },
 
