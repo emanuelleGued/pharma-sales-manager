@@ -1,13 +1,14 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useCallback} from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors } from '../../src/theme/colors';
 import { Header } from '../../src/components/Header';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import DoctorService from '../../src/services/DoctorService';
 import { Visit } from '@/src/context/VisitContext';
 import VisitService from '@/src/services/VisitService';
+import PerformanceService from '@/src/services/PerformanceService';
 
 export default function PerformanceScreen() {
   const router = useRouter();
@@ -16,19 +17,14 @@ export default function PerformanceScreen() {
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
-  const [totalDoctors, setTotalDoctors] = useState(0);
-  
-  const visitsThisMonth = visits.filter(v => {
-    const d = new Date(v.date);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear && v.status === 'CONCLUIDA';
-  });
-  
-  const uniqueDoctorsVisited = new Set(visitsThisMonth.map(v => v.doctorId)).size;
-  const doctorBasePercent = totalDoctors > 0 ? (uniqueDoctorsVisited / totalDoctors) * 100 : 0;
+  const [stats, setStats] = useState({ uniqueDoctorsVisited: 0, targetDoctors: 1 });
+  const [summary, setSummary] = useState({ completedVisits: 0, totalVisits: 200 });
+
+  const doctorBasePercent = stats.targetDoctors > 0 ? (stats.uniqueDoctorsVisited / stats.targetDoctors) * 100 : 0;
 
   const weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
   const today = new Date();
-  const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; 
+  const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1;
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - dayOfWeek);
   
@@ -36,7 +32,7 @@ export default function PerformanceScreen() {
   
   visits.forEach(v => {
     if (v.status === 'CONCLUIDA') {
-      const vDate = new Date(v.date + 'T12:00:00'); 
+      const vDate = new Date(v.date + 'T12:00:00');
       const diffTime = vDate.getTime() - startOfWeek.getTime();
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       if (diffDays >= 0 && diffDays < 7) {
@@ -45,35 +41,31 @@ export default function PerformanceScreen() {
     }
   });
 
-  const maxWeeklyVisits = Math.max(...weeklyVisits, 12); 
+  const maxWeeklyVisits = Math.max(...weeklyVisits, 12);
 
-  const monthGoal = 200; 
-  const monthProgress = visitsThisMonth.length;
-  const monthPercent = (monthProgress / monthGoal) * 100;
+  const monthGoal = summary.totalVisits;
+  const monthProgress = summary.completedVisits;
+  const monthPercent = monthGoal > 0 ? (monthProgress / monthGoal) * 100 : 0;
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const daysPassed = today.getDate();
   const projectedVisits = daysPassed > 0 ? Math.round((monthProgress / daysPassed) * daysInMonth) : 0;
-  const projectedPercent = Math.round((projectedVisits / monthGoal) * 100);
+  const projectedPercent = monthGoal > 0 ? Math.round((projectedVisits / monthGoal) * 100) : 0;
 
-  useEffect(() => {
-    async function loadVisits() {
-      try {
-        const data = await VisitService.getAllVisits();
-        setVisits(data);
-      } catch (error) {
-        console.error('Erro ao carregar visitas:', error);
+  useFocusEffect(
+    useCallback(() => {
+      async function loadVisits() {
+        try {
+          const data = await VisitService.getAllVisits();
+          setVisits(data);
+        } catch (error) {
+        }
       }
-    }
-
-    loadVisits();
-  }, []);
-
-  useEffect(() => {
-    DoctorService.getAllDoctors()
-      .then((data) => setTotalDoctors(data.length))
-      .catch((err) => console.error('Erro ao buscar total de médicos para performance:', err));
-  }, []);
+      loadVisits();
+      PerformanceService.getPerformanceStats(1).then(setStats).catch(() => {});
+      PerformanceService.getPerformanceSummary(1).then(setSummary).catch(() => {});
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -83,12 +75,11 @@ export default function PerformanceScreen() {
       />
       <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]} showsVerticalScrollIndicator={false}>
         
-        {/* Base de Médicos */}
         <View style={styles.baseCard}>
            <View style={styles.baseTop}>
              <View style={styles.baseInfo}>
                <Text style={styles.baseSubtitle}>Base de Médicos</Text>
-               <Text style={styles.baseTitle}>{uniqueDoctorsVisited} <Text style={styles.baseTitleSmall}>/ {totalDoctors}</Text></Text>
+               <Text style={styles.baseTitle}>{stats.uniqueDoctorsVisited} <Text style={styles.baseTitleSmall}>/ {stats.targetDoctors}</Text></Text>
                <Text style={styles.baseDesc}>Doutores visitados este mês</Text>
              </View>
              <View style={styles.avatarContainer}>
@@ -100,7 +91,6 @@ export default function PerformanceScreen() {
            </View>
         </View>
 
-        {/* Visitas da Semana */}
         <Text style={styles.sectionTitle}>Visitas Esta Semana</Text>
         <View style={styles.chartCard}>
           <View style={styles.chartContainer}>
@@ -123,7 +113,6 @@ export default function PerformanceScreen() {
           </View>
         </View>
 
-        {/* Progresso Mensal */}
         <Text style={styles.sectionTitle}>Progresso Mensal</Text>
         <View style={styles.monthCard}>
            <View style={styles.monthTop}>
@@ -141,7 +130,6 @@ export default function PerformanceScreen() {
            </Text>
         </View>
 
-        {/* Projeção do Mês */}
         <View style={styles.projectionCard}>
           <View style={styles.projectionIcon}>
              <Feather name="target" size={24} color={colors.secondary} />
@@ -154,7 +142,6 @@ export default function PerformanceScreen() {
           </View>
         </View>
 
-        {/* Últimas Conquistas */}
         <View style={styles.achievementsHeader}>
            <Feather name="award" size={20} color={colors.primary} />
            <Text style={styles.sectionTitleAchievements}>Últimas Conquistas</Text>
