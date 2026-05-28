@@ -1,17 +1,19 @@
 import { View, Text, StyleSheet, ScrollView,  Animated, Alert } from 'react-native';
-import VisitCard from '../../src/components/VisitCard'; 
-import { Header } from '../../src/components/Header'; 
+import VisitCard from '../../src/components/VisitCard';
+import { Header } from '../../src/components/Header';
 import { colors } from '../../src/theme/colors';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useVisits } from '../../src/context/VisitContext';
-import { useEffect, useState, useRef } from 'react'; 
-import { Feather } from '@expo/vector-icons'; 
-import DoctorService, { DoctorResponse } from '../../src/services/DoctorService'; 
+import { useEffect, useState, useRef } from 'react';
+import { Feather } from '@expo/vector-icons';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
 
 export default function RepHomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { visits, deleteVisit } = useVisits();
+  const tabBarHeight = useBottomTabBarHeight();
 
   const getStatusLabel = (status: string) => {
     switch (status) {
@@ -88,7 +90,7 @@ export default function RepHomeScreen() {
         onNotificationsClick={() => router.push('../notifications')} 
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}>
         <View style={styles.progressContainer}>
            <Text style={styles.progressText}>{completedToday} / 10</Text>
            <Text style={styles.subText}>Visitas realizadas hoje</Text>
@@ -143,7 +145,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100,
   },
   progressContainer: {
     alignItems: 'center',

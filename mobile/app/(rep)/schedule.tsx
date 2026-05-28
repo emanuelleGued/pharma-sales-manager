@@ -8,14 +8,16 @@ import {
 } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import VisitCard from '../../src/components/VisitCard';
 import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
-import { useVisits } from '../../src/context/VisitContext'; 
+import { useVisits } from '../../src/context/VisitContext';
 
 export default function ScheduleScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const getLocalDateString = (d: Date) => {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -122,7 +124,10 @@ export default function ScheduleScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.calendarWrapper}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
           <TouchableOpacity onPress={prevDate}>
             <Text style={styles.arrow}>{'<'}</Text>
@@ -185,7 +190,7 @@ export default function ScheduleScreen() {
             <View style={styles.monthGrid}>
               {monthDays.map((item, index) => {
                 if (!item) return <View key={`empty-${index}`} style={styles.monthDayBox} />;
-                
+
                 const isSelected = item.date === selectedDate;
                 const isToday = item.date === getLocalDateString(new Date());
                 const hasVisit = (visits || []).some(v => v.date === item.date);
@@ -218,16 +223,8 @@ export default function ScheduleScreen() {
             </View>
           </View>
         )}
-      </View>
 
-
-
-      <View style={styles.listContainer}>
-        <ScrollView
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          style={{ overflow: 'visible' }}
-        >
+        <View style={styles.listSection}>
           <Text style={styles.title}>
             Visitas do dia ({filteredVisits.length})
           </Text>
@@ -254,8 +251,8 @@ export default function ScheduleScreen() {
           ) : (
             <Text style={styles.empty}>Nenhuma visita</Text>
           )}
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -265,10 +262,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  calendarWrapper: {
-    zIndex: 10,
-    backgroundColor: colors.background,
-    paddingBottom: 8,
+  scrollContent: {
+    flexGrow: 1,
   },
 
   header: {
@@ -323,15 +318,9 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 
-  list: {
+  listSection: {
     padding: 16,
-    paddingBottom: 100,
-    overflow: 'visible',
-  },
-
-  listContainer: {
-    flex: 1,
-    overflow: 'visible',
+    paddingTop: 24,
   },
 
   title: {
