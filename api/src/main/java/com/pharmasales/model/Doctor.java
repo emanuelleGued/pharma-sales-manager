@@ -1,11 +1,6 @@
 package com.pharmasales.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "doctors")
@@ -30,8 +25,9 @@ public class Doctor {
     @Column(nullable = false)
     private String location;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean visited = false;
+    private DoctorStatus status = DoctorStatus.SEM_VISITAS;
 
     protected Doctor() {
     }
@@ -68,9 +64,7 @@ public class Doctor {
         return location;
     }
 
-    public boolean isVisited() {
-        return visited;
-    }
+    public DoctorStatus getStatus() { return status; }
 
     public void setName(String name) {
         this.name = name;
@@ -92,7 +86,7 @@ public class Doctor {
         this.location = location;
     }
 
-    public void setVisited(boolean visited) {
-        this.visited = visited;
+    public void setStatus(DoctorStatus status) {
+        this.status = status;
     }
 }

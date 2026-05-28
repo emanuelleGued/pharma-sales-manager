@@ -12,16 +12,17 @@ export default function VisitDetailsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { id } = params;
+  const visitId = Number(params.id);
   
   const { visits, updateVisit } = useVisits();
-  const visit = visits.find(v => v.id === id);
+  const visit = visits.find(v => v.id === visitId);
   const [doctor, setDoctor] = useState<DoctorResponse | null>(null);
 
   useEffect(() => {
     if (visit?.doctorId) {
       DoctorService.getAllDoctors()
         .then((docs) => {
-          const found = docs.find((d) => d.id === visit.doctorId);
+          const found = docs.find((d) => Number(d.id) === visit.doctorId);
           if (found) setDoctor(found);
         })
         .catch((err) => console.error('Erro ao carregar dados do médico para conclusão:', err));
@@ -33,22 +34,22 @@ export default function VisitDetailsScreen() {
   const [goalAchieved, setGoalAchieved] = useState(false);
 
   const results = [
-    { id: 'completed', label: 'Visita Concluída', icon: 'check-circle' as const },
-    { id: 'rescheduled', label: 'Reagendada', icon: 'clock' as const },
-    { id: 'canceled', label: 'Não Realizada/Cancelada', icon: 'x-circle' as const },
+    { id: 'CONCLUIDA', label: 'Visita Concluída', icon: 'check-circle' as const },
+    { id: 'REAGENDADA', label: 'Reagendada', icon: 'clock' as const },
+    { id: 'CANCELADA', label: 'Não Realizada/Cancelada', icon: 'x-circle' as const },
   ];
 
   const handleSubmit = () => {
     let message = 'Visita atualizada com sucesso!';
-    if (selectedResult === 'completed') message = 'Visita concluída com sucesso!';
-    else if (selectedResult === 'rescheduled') message = 'Visita reagendada!';
-    else if (selectedResult === 'canceled') message = 'Visita cancelada!';
+    if (selectedResult === 'CONCLUIDA') message = 'Visita concluída com sucesso!';
+    else if (selectedResult === 'REAGENDADA') message = 'Visita reagendada!';
+    else if (selectedResult === 'CANCELADA') message = 'Visita cancelada!';
 
     if (visit && selectedResult) {
-      updateVisit({
+      updateVisit(visit.id, {
         ...visit,
-        status: selectedResult as 'completed' | 'canceled' | 'rescheduled',
-        observations: notes,
+        status: selectedResult as 'CONCLUIDA' | 'CANCELADA' | 'REAGENDADA',
+        observation: notes, 
       });
     }
 
@@ -125,7 +126,7 @@ export default function VisitDetailsScreen() {
           ))}
         </View>
 
-        {selectedResult === 'completed' && (
+        {selectedResult === 'CONCLUIDA' && (
           <View style={styles.goalCard}>
             <View style={styles.goalTextContainer}>
               <Text style={styles.goalTitle}>Meta atingida nesta visita?</Text>

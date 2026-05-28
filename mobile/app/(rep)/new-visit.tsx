@@ -19,7 +19,6 @@ import { colors } from '../../src/theme/colors';
 import DoctorService, {DoctorResponse} from '@/src/services/DoctorService';
 import { useVisits } from '../../src/context/VisitContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import VisitService from '@/src/services/VisitService';
 
 export default function NewVisitScreen() {
   const insets = useSafeAreaInsets();
@@ -73,17 +72,25 @@ export default function NewVisitScreen() {
   const isFormValid = selectedDoctor && visitDate && visitTime;
 
   const handleSubmit = async () => {
-    if (selectedDoctor && visitDate && visitTime) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const localDate = `${year}-${month}-${day}`;
-      await VisitService.createVisit({
+    if (!selectedDoctor || !visitDate || !visitTime) {
+      Alert.alert("Erro", "Por favor, preencha Médico, Data e Hora.");
+      return;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const localDate = `${year}-${month}-${day}`;
+
+    try {
+      await addVisit({
         doctorId: Number(selectedDoctor.id),
-        userId: 1,  
+        userId: 1,
         date: localDate,
+        time: visitTime,
         observation: observations,
-        status: 'PENDING',
+        presentedMaterial,
+        status: 'AGENDADA',
       });
 
       setSelectedDoctor(null);
@@ -94,10 +101,10 @@ export default function NewVisitScreen() {
 
       router.replace({
         pathname: '/(rep)',
-        params: { success: Date.now().toString() } 
+        params: { success: Date.now().toString() }
       });
-    } else {
-      Alert.alert("Erro", "Por favor, preencha Médico, Data e Hora.");
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível registrar a visita. Tente novamente.");
     }
   };
 

@@ -1,22 +1,27 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import React, { useState, useMemo, useEffect, useCallback} from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
 import { Doctor } from '../../src/types/doctor';
 import DoctorService from '../../src/services/DoctorService';
+import { useFocusEffect } from 'expo-router';
 
 export default function DoctorsScreen() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<'Todos' | 'Visitados' | 'Pendentes'>('Todos');
+  const [filter, setFilter] = useState<'Todos' | 'Visitados' | 'Pendentes' | 'Não Agendados'>('Todos');
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
-  useEffect(() => {
-    loadDoctors();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadDoctors();
+    }, [])
+  );
 
   const loadDoctors = async () => {
     try {
@@ -58,18 +63,32 @@ export default function DoctorsScreen() {
   const filteredDoctors = useMemo(() => {
     return doctors.filter(doc => {
       const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesFilter = filter === 'Todos' ? true :
-        filter === 'Visitados' ? doc.visited :
-          !doc.visited;
-
+                            doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+  
+      const matchesFilter =
+        filter === 'Todos' ? true :
+        filter === 'Visitados' ? doc.status === 'VISITADO' :
+        filter === 'Pendentes' ? doc.status === 'PENDENTE' :
+        doc.status === 'SEM_VISITAS';
+  
       return matchesSearch && matchesFilter;
     });
   }, [doctors, searchQuery, filter]);
-
-  const visitedCount = doctors.filter(d => d.visited).length;
+  
+  const visitedCount = doctors.filter(d => d.status === 'VISITADO').length;
   const totalCount = doctors.length;
+
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case 'VISITADO':
+        return { label: 'Visitado', bg: '#E6F6F4', color: '#00A896', icon: 'check-circle' };
+      case 'PENDENTE':
+        return { label: 'Pendente', bg: '#FEF3C7', color: '#D97706', icon: 'clock' };
+      case 'SEM_VISITAS':
+      default:
+        return { label: 'Não Agendado', bg: '#F1F5F9', color: '#64748B', icon: 'minus' };
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -104,30 +123,36 @@ export default function DoctorsScreen() {
         />
       </View>
 
-      <View style={styles.filterContainer}>
-        {(['Todos', 'Visitados', 'Pendentes'] as const).map(f => (
-          <TouchableOpacity
-            key={f}
-            style={[
-              styles.filterButton,
-              filter === f ? styles.filterButtonActive : styles.filterButtonInactive
-            ]}
-            onPress={() => setFilter(f)}
-          >
-            <Text style={[
-              styles.filterText,
-              filter === f ? styles.filterTextActive : styles.filterTextInactive
-            ]}>
-              {f}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      <View style={styles.filterWrapper}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterContainer}
+        >
+          {(['Todos', 'Visitados', 'Pendentes', 'Não Agendados'] as const).map(f => (
+            <TouchableOpacity
+              key={f}
+              style={[
+                styles.filterButton,
+                filter === f ? styles.filterButtonActive : styles.filterButtonInactive
+              ]}
+              onPress={() => setFilter(f)}
+            >
+              <Text style={[
+                styles.filterText,
+                filter === f ? styles.filterTextActive : styles.filterTextInactive
+              ]}>
+                {f}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
       <FlatList
         data={filteredDoctors}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 24 }]}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -140,11 +165,15 @@ export default function DoctorsScreen() {
               <Text style={styles.doctorClinic}>{item.clinicName} • {item.location}</Text>
             </View>
             <View style={styles.checkButton}>
-              {item.visited ? (
-                <View style={styles.circleVisited} />
-              ) : (
-                <View style={styles.circlePending} />
-              )}
+              {(() => {
+                const config = getStatusConfig(item.status);
+                return (
+                  <View style={[styles.badge, { backgroundColor: config.bg }]}>
+                    <Feather name={config.icon as any} size={12} color={config.color} style={{ marginRight: 4 }} />
+                    <Text style={[styles.badgeText, { color: config.color }]}>{config.label}</Text>
+                  </View>
+                );
+              })()}
             </View>
           </TouchableOpacity>
         )}
@@ -216,10 +245,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
+  filterWrapper: {
+    marginBottom: 20,
+  },
   filterContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 20,
     gap: 8,
   },
   filterButton: {
@@ -250,7 +282,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
-    paddingBottom: 100,
     gap: 12,
   },
   doctorCard: {
@@ -304,5 +335,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#CBD5E1',
     backgroundColor: colors.background,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: 'bold',
   },
 });

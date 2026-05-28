@@ -4,6 +4,7 @@ import { colors } from '../../src/theme/colors';
 import { Header } from '../../src/components/Header';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import DoctorService from '../../src/services/DoctorService';
 import { Visit } from '@/src/context/VisitContext';
 import VisitService from '@/src/services/VisitService';
@@ -11,6 +12,7 @@ import VisitService from '@/src/services/VisitService';
 export default function PerformanceScreen() {
   const router = useRouter();
   const [visits, setVisits] = useState<Visit[]>([]);
+  const tabBarHeight = useBottomTabBarHeight();
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -18,7 +20,7 @@ export default function PerformanceScreen() {
   
   const visitsThisMonth = visits.filter(v => {
     const d = new Date(v.date);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear && v.status === 'COMPLETED';
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear && v.status === 'CONCLUIDA';
   });
   
   const uniqueDoctorsVisited = new Set(visitsThisMonth.map(v => v.doctorId)).size;
@@ -33,7 +35,7 @@ export default function PerformanceScreen() {
   const weeklyVisits = Array(7).fill(0);
   
   visits.forEach(v => {
-    if (v.status === 'COMPLETED') {
+    if (v.status === 'CONCLUIDA') {
       const vDate = new Date(v.date + 'T12:00:00'); 
       const diffTime = vDate.getTime() - startOfWeek.getTime();
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -79,7 +81,7 @@ export default function PerformanceScreen() {
         onProfileClick={() => router.push('../profile')} 
         onNotificationsClick={() => router.push('../notifications')} 
       />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]} showsVerticalScrollIndicator={false}>
         
         {/* Base de Médicos */}
         <View style={styles.baseCard}>
@@ -186,7 +188,7 @@ export default function PerformanceScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { padding: 20, paddingBottom: 100 },
+  scrollContent: { padding: 20 },
   
   baseCard: {
     backgroundColor: '#991B1B', 

@@ -16,7 +16,7 @@ export default function EditVisitScreen() {
   const { visits, updateVisit } = useVisits();
   const router = useRouter();
 
-  const visit = visits.find((v) => v.id === id);
+  const visit = visits.find((v) => String(v.id) === String(id));
   const [doctor, setDoctor] = useState<DoctorResponse | null>(null);
 
   const [date, setDate] = useState(visit?.date || '');
@@ -25,7 +25,7 @@ export default function EditVisitScreen() {
 
   useEffect(() => {
   if (visit?.doctorId) {
-    DoctorService.getDoctorById(visit.doctorId)
+    DoctorService.getDoctorById(String(visit.doctorId))
       .then((data) => setDoctor(data))
       .catch((err) => Alert.alert('Erro', 'Não foi possível carregar os dados do médico.'));
   }
@@ -33,14 +33,25 @@ export default function EditVisitScreen() {
 
   if (!visit || !doctor) return null;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!date || !time) {
       Alert.alert('Atenção', 'Preencha a data e o horário.');
       return;
     }
 
-    updateVisit({ ...visit, date, time, observations });
-    router.back();
+    try {
+      await updateVisit(visit.id, {
+        doctorId: visit.doctorId,
+        userId: visit.userId,
+        date,
+        time,
+        observation: observations,
+        status: visit.status,
+      });
+      router.back();
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível salvar as alterações.');
+    }
   };
 
   return (
