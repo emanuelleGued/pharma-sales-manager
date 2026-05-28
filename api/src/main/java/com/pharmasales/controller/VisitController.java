@@ -25,7 +25,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/visits")
-@CrossOrigin
 public class VisitController {
     private final VisitService visitService;
 
