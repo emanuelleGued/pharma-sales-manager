@@ -10,7 +10,7 @@ public record DoctorResponse(
         String specialty,
         String clinicName,
         String location,
-        String status
+        DoctorStatus status
 ) {
     public static DoctorResponse from(Doctor doctor) {
         return new DoctorResponse(
@@ -20,7 +20,7 @@ public record DoctorResponse(
                 doctor.getSpecialty(),
                 doctor.getClinicName(),
                 doctor.getLocation(),
-                (doctor.getStatus() != null ? doctor.getStatus() : DoctorStatus.SEM_VISITAS).name()
+                doctor.getStatus()
         );
     }
 }

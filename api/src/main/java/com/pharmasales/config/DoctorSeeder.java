@@ -21,29 +21,23 @@ public class DoctorSeeder {
             }
 
             List<Doctor> doctors = List.of(
-                    build("Dr. Marcos Silva", "CRM-SP 12345", "Cardiologista", "Clínica do Coração", "São Paulo, SP", true),
-                    build("Dra. Ana Paula Costa", "CRM-SP 23456", "Pediatra", "Clínica Infantil", "São Paulo, SP", true),
-                    build("Dr. Roberto Santos", "CRM-SP 34567", "Ortopedista", "OrtoCenter", "Campinas, SP", false),
-                    build("Dra. Fernanda Lima", "CRM-SP 45678", "Dermatologista", "Pele e Cia", "São Paulo, SP", true),
-                    build("Dr. Carlos Mendes", "CRM-SP 56789", "Clínico Geral", "Saúde Total", "Guarulhos, SP", false),
-                    build("Dra. Juliana Ribeiro", "CRM-SP 67890", "Ginecologista", "Saúde da Mulher", "São Bernardo do Campo, SP", false),
-                    build("Dr. Ricardo Almeida", "CRM-SP 78901", "Neurologista", "Neuro Vida", "Osasco, SP", false),
-                    build("Dra. Mariana Costa", "CRM-SP 89012", "Oftalmologista", "Visão Perfeita", "Santo André, SP", true)
+                    build("Dr. Marcos Silva", "CRM-SP 12345", "Cardiologista", "Clínica do Coração", "São Paulo, SP", DoctorStatus.SEM_VISITAS),
+                    build("Dra. Ana Paula Costa", "CRM-SP 23456", "Pediatra", "Clínica Infantil", "São Paulo, SP", DoctorStatus.SEM_VISITAS),
+                    build("Dr. Roberto Santos", "CRM-SP 34567", "Ortopedista", "OrtoCenter", "Campinas, SP", DoctorStatus.SEM_VISITAS),
+                    build("Dra. Fernanda Lima", "CRM-SP 45678", "Dermatologista", "Pele e Cia", "São Paulo, SP", DoctorStatus.SEM_VISITAS),
+                    build("Dr. Carlos Mendes", "CRM-SP 56789", "Clínico Geral", "Saúde Total", "Guarulhos, SP", DoctorStatus.SEM_VISITAS),
+                    build("Dra. Juliana Ribeiro", "CRM-SP 67890", "Ginecologista", "Saúde da Mulher", "São Bernardo do Campo, SP", DoctorStatus.SEM_VISITAS),
+                    build("Dr. Ricardo Almeida", "CRM-SP 78901", "Neurologista", "Neuro Vida", "Osasco, SP", DoctorStatus.SEM_VISITAS),
+                    build("Dra. Mariana Costa", "CRM-SP 89012", "Oftalmologista", "Visão Perfeita", "Santo André, SP", DoctorStatus.SEM_VISITAS)
             );
 
             repository.saveAll(doctors);
         };
     }
 
-    private Doctor build(String name, String crm, String specialty, String clinicName, String location, boolean visited) {
+    private Doctor build(String name, String crm, String specialty, String clinicName, String location, DoctorStatus status) {
         Doctor doctor = new Doctor(name, crm, specialty, clinicName, location);
-
-        if (visited) {
-            doctor.setStatus(DoctorStatus.VISITADO);
-        } else {
-            doctor.setStatus(DoctorStatus.SEM_VISITAS);
-        }
-
+        doctor.setStatus(status);
         return doctor;
     }
 }
