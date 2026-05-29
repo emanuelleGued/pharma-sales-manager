@@ -12,10 +12,9 @@ export default function VisitDetailsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { id } = params;
-  const visitId = Number(params.id);
-  
+
   const { visits, updateVisit } = useVisits();
-  const visit = visits.find(v => v.id === visitId);
+  const visit = visits.find((v) => String(v.id) === String(id));
   const [doctor, setDoctor] = useState<DoctorResponse | null>(null);
 
   useEffect(() => {
