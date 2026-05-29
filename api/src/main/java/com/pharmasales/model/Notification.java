@@ -1,13 +1,8 @@
 package com.pharmasales.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,19 +15,27 @@ import lombok.Setter;
 @Entity
 @Table(name = "notifications")
 public class Notification {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "title", nullable = false)
+    private String title;
+
     @Column(name = "message", nullable = false)
     private String message;
 
-    @Column(name = "isRead", nullable = false)
-    private boolean isRead;
+    @Column(name = "is_read", nullable = false)
+    private boolean read;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "user_id_destiny", nullable = false)
     private Long userIdDestiny;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRole role;
 }

@@ -1,11 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import { useVisits } from '../../src/context/VisitContext';
-import { useState, useEffect } from 'react';
 import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
 
 export default function ScheduleDetailsScreen() {

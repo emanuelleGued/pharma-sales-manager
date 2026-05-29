@@ -1,32 +1,13 @@
 package com.pharmasales.repository;
 
 import com.pharmasales.model.Notification;
-
+import com.pharmasales.model.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface NotificationRepository
-        extends JpaRepository<Notification, Long> {
-
-    @Query("""
-        SELECT n
-        FROM Notification n
-        WHERE n.userId = :userId
-        ORDER BY n.createdAt DESC
-    """)
-    List<Notification> findRepresentativeNotifications(
-            Long userId
-    );
-
-    @Query("""
-        SELECT n
-        FROM Notification n
-        WHERE n.userId = :userId
-        ORDER BY n.createdAt DESC
-    """)
-    List<Notification> findManagerNotifications(
-            Long userId
-    );
+@Repository
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
+    List<Notification> findByUserIdAndRoleOrderByCreatedAtDesc(Long userId, UserRole role);
 }

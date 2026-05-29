@@ -5,7 +5,6 @@ import { Header } from '../../src/components/Header';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import DoctorService from '../../src/services/DoctorService';
 import { Visit } from '@/src/context/VisitContext';
 import VisitService from '@/src/services/VisitService';
 
