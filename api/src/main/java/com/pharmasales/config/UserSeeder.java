@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.pharmasales.model.User;
+import com.pharmasales.model.UserRole;
 import com.pharmasales.repository.UserRepository;
 
 @Configuration
@@ -23,7 +24,7 @@ public class UserSeeder {
                     "Representante Demo",
                     "rep@demo.com",
                     "demo",
-                    "REP"
+                    UserRole.REPRESENTATIVE
             ));
         };
     }

@@ -11,12 +11,12 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private String role;
+    private UserRole role;
 
     protected User() {
     }
 
-    public User(String name, String email, String password, String role) {
+    public User(String name, String email, String password, UserRole role) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -35,7 +35,7 @@ public class User {
         return email;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 }
