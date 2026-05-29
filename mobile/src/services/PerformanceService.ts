@@ -12,12 +12,12 @@ export interface PerformanceMetricsDTO {
 
 class PerformanceService {
   async getSummary(repId: number): Promise<PerformanceSummaryDTO> {
-    const response = await api.get(`/api/performance/summary?repId=${repId}`);
+    const response = await api.get(`/performance/summary?repId=${repId}`);
     return response.data;
   }
 
   async getMetrics(repId: number): Promise<PerformanceMetricsDTO> {
-    const response = await api.get(`/api/performance/metrics?repId=${repId}`);
+    const response = await api.get(`/performance/metrics?repId=${repId}`);
     return response.data;
   }
 

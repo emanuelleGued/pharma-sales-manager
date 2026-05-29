@@ -8,7 +8,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
-import PerformanceService from '../../src/services/PerformanceService';
+
+const DAILY_GOAL = 10;
 
 export default function RepHomeScreen() {
   const router = useRouter();
@@ -33,9 +34,8 @@ export default function RepHomeScreen() {
 
   const todayString = getLocalDateString(new Date());
   const todayVisits = visits.filter(v => v.date === todayString);
-
-  const [summary, setSummary] = useState({ completedVisits: 0, totalVisits: 10 });
-  const progressPercent = summary.totalVisits > 0 ? (summary.completedVisits / summary.totalVisits) * 100 : 0;
+  const completedToday = todayVisits.filter(v => v.status === 'CONCLUIDA').length;
+  const progressPercent = DAILY_GOAL > 0 ? (completedToday / DAILY_GOAL) * 100 : 0;
   
   const [showToast, setShowToast] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -47,10 +47,7 @@ export default function RepHomeScreen() {
       loadVisits();
       DoctorService.getAllDoctors()
         .then((data) => setDoctors(data))
-        .catch(() => {});
-      PerformanceService.getPerformanceSummary(1)
-        .then((data) => setSummary(data))
-        .catch(() => {});
+        .catch((err) => console.warn('Erro ao carregar médicos na home:', err));
     }, [])
   );
 
@@ -98,7 +95,7 @@ export default function RepHomeScreen() {
 
       <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}>
         <View style={styles.progressContainer}>
-           <Text style={styles.progressText}>{summary.completedVisits} / {summary.totalVisits}</Text>
+           <Text style={styles.progressText}>{completedToday} / {DAILY_GOAL}</Text>
            <Text style={styles.subText}>Visitas realizadas hoje</Text>
            <View style={styles.badgeMeta}>
               <Text style={styles.badgeText}>{Math.round(progressPercent)}% da meta</Text>
