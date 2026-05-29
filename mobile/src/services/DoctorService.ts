@@ -1,5 +1,9 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
+import {
+  getCachedDoctors,
+  setCachedDoctors,
+} from './storage/doctorStorage';
 
 const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
 const API_BASE_URL =
@@ -53,10 +57,23 @@ class DoctorService {
         throw new Error(`Erro ao buscar médicos: ${response.statusText}`);
       }
 
-      return await response.json();
+      const data: DoctorResponse[] = await response.json();
+      if (!search) {
+        await setCachedDoctors(data);
+      }
+      return data;
     } catch (error) {
-      console.error('Erro ao buscar médicos:', error);
-      throw error;
+      console.warn('Falha ao buscar médicos da API, usando cache local:', error);
+      const cached = await getCachedDoctors();
+      if (search) {
+        const term = search.toLowerCase();
+        return cached.filter(
+          (d) =>
+            d.name.toLowerCase().includes(term) ||
+            d.specialty.toLowerCase().includes(term)
+        );
+      }
+      return cached;
     }
   }
 
