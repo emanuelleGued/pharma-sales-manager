@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { VisitProvider } from '../src/context/VisitContext';
 import { NetworkProvider } from '../src/context/NetworkContext';
+import { NotificationProvider } from '../src/context/NotificationContext';
 import { OfflineIndicator } from '../src/components/OfflineIndicator';
 
 export default function RootLayout() {
@@ -11,16 +12,18 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <NetworkProvider>
         <VisitProvider>
-          <OfflineIndicator />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: '#F5F7FA' },
-            }}
-          >
-            <Stack.Screen name="index" />
-          </Stack>
-          <StatusBar style="dark" hidden={true} />
+          <NotificationProvider>
+            <OfflineIndicator />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: '#F5F7FA' },
+              }}
+            >
+              <Stack.Screen name="index" />
+            </Stack>
+            <StatusBar style="dark" hidden={true} />
+          </NotificationProvider>
         </VisitProvider>
       </NetworkProvider>
     </SafeAreaProvider>

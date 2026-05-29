@@ -1,22 +1,52 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
-import { mockNotificationSettings, NotificationOption } from '../../src/types/notificationSettings';
+import { NotificationOption } from '../../src/types/notificationSettings';
+import api from '../../src/services/api';
 
 export default function NotificationSettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [notifications, setNotifications] = useState<NotificationOption[]>(mockNotificationSettings);
+  const [notifications, setNotifications] = useState<NotificationOption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const toggleNotification = (id: string) => {
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get('/api/notifications/settings');
+        setNotifications(response.data);
+      } catch {
+        setError('Erro ao carregar configurações');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const toggleNotification = async (id: string) => {
+    const target = notifications.find((n) => n.id === id);
+    if (!target) return;
+
+    const updated = { ...target, enabled: !target.enabled };
+
     setNotifications((prev) =>
-      prev.map((notif) =>
-        notif.id === id ? { ...notif, enabled: !notif.enabled } : notif
-      )
+      prev.map((n) => (n.id === id ? updated : n))
     );
+
+    try {
+      await api.patch(`/api/notifications/settings/${id}`, { enabled: updated.enabled });
+    } catch {
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? target : n))
+      );
+    }
   };
 
   return (
@@ -30,6 +60,10 @@ export default function NotificationSettingsScreen() {
 
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.description}>Gerencie suas preferências de notificação</Text>
+
+        {loading && <ActivityIndicator color={colors.primary} style={{ marginTop: 20 }} />}
+
+        {error && <Text style={styles.errorText}>{error}</Text>}
 
         <View style={styles.list}>
           {notifications.map((notification) => (
@@ -72,20 +106,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
-  title: { 
-    fontSize: 24, 
-    fontWeight: 'bold', 
-    color: colors.text 
-  },
+  title: { fontSize: 24, fontWeight: 'bold', color: colors.text },
   content: { padding: 24 },
-  description: { 
-    fontSize: 16, 
-    color: colors.textSecondary, 
-    marginBottom: 24 
-  },
-  list: { 
-    gap: 16 
-  },
+  description: { fontSize: 16, color: colors.textSecondary, marginBottom: 24 },
+  list: { gap: 16 },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -96,18 +120,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
   },
-  textContainer: { 
-    flex: 1, 
-    marginRight: 16 
-  },
-  cardTitle: { 
-    fontSize: 16, 
-    fontWeight: 'bold', 
-    color: colors.text, 
-    marginBottom: 4 
-  },
-  cardDescription: { 
-    fontSize: 13, 
-    color: colors.textSecondary 
-  },
+  textContainer: { flex: 1, marginRight: 16 },
+  cardTitle: { fontSize: 16, fontWeight: 'bold', color: colors.text, marginBottom: 4 },
+  cardDescription: { fontSize: 13, color: colors.textSecondary },
+  errorText: { textAlign: 'center', color: 'red', marginBottom: 16 },
 });

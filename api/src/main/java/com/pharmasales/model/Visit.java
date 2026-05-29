@@ -19,7 +19,6 @@ public class Visit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     private LocalDate date;
 
     private String observation;
@@ -28,6 +27,7 @@ public class Visit {
 
     private String presentedMaterial;
 
+    @Enumerated(EnumType.STRING)
     private VisitStatus status;
 
     @ManyToOne

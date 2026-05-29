@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context'; 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
+import { useNotifications } from '../context/NotificationContext';
 
 interface HeaderProps {
   onProfileClick: () => void;
@@ -10,7 +11,8 @@ interface HeaderProps {
 }
 
 export function Header({ onProfileClick, onNotificationsClick }: HeaderProps) {
-  const insets = useSafeAreaInsets(); 
+  const insets = useSafeAreaInsets();
+  const { unreadCount } = useNotifications();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + 16 }]}>
@@ -28,7 +30,7 @@ export function Header({ onProfileClick, onNotificationsClick }: HeaderProps) {
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={styles.actionButton} onPress={onNotificationsClick}>
           <Feather name="bell" size={20} color={colors.textSecondary} />
-          <View style={styles.notificationDot} />
+          {unreadCount > 0 && <View style={styles.notificationDot} />}
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton} onPress={onProfileClick}>

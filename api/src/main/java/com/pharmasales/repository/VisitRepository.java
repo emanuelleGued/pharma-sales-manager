@@ -37,4 +37,7 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
 
     @Query("SELECT COUNT(DISTINCT v.doctor.id) FROM Visit v WHERE v.user.id = :repId AND v.date BETWEEN :startDate AND :endDate")
     Long countTargetDoctorsByRepIdAndPeriod(@Param("repId") Long repId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT v FROM Visit v WHERE v.date = :date AND v.status = :status")
+    List<Visit> findByDateAndStatus(@Param("date") LocalDate date, @Param("status") VisitStatus status);
 }
