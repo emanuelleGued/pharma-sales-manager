@@ -5,6 +5,7 @@ import React, {
   ReactNode,
   useEffect,
   useCallback,
+  useRef,
 } from 'react';
 
 import { Doctor } from '../types/doctor';
@@ -61,6 +62,18 @@ interface VisitContextData {
 
 const VisitContext = createContext<VisitContextData>({} as VisitContextData);
 
+function dedupeVisits<T extends { id: number | string }>(list: T[]): T[] {
+  const seen = new Set<string>();
+  const result: T[] = [];
+  for (const v of list) {
+    const key = String(v.id);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(v);
+  }
+  return result;
+}
+
 function mapVisitResponseToVisit(visit: VisitResponse): CachedVisit {
   return {
     id: visit.id,
@@ -81,6 +94,7 @@ export function VisitProvider({ children }: { children: ReactNode }) {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const loadingRef = useRef(false);
 
   const refreshPendingCount = useCallback(async () => {
     const q = await getQueue();
@@ -88,6 +102,8 @@ export function VisitProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loadVisits = useCallback(async () => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
     setLoading(true);
     try {
       const cached = await getCachedVisits();
@@ -107,7 +123,7 @@ export function VisitProvider({ children }: { children: ReactNode }) {
         (v) => v.localId && pendingLocalIds.has(v.localId)
       );
 
-      const merged: CachedVisit[] = [...pendingFromCache, ...formatted];
+      const merged = dedupeVisits([...pendingFromCache, ...formatted]);
       await setCachedVisits(merged);
       setVisits(merged);
     } catch (error) {
@@ -117,6 +133,7 @@ export function VisitProvider({ children }: { children: ReactNode }) {
     } finally {
       await refreshPendingCount();
       setLoading(false);
+      loadingRef.current = false;
     }
   }, [isConnected, refreshPendingCount]);
 
@@ -131,7 +148,7 @@ export function VisitProvider({ children }: { children: ReactNode }) {
           const created = await VisitService.createVisit(visitData);
           const formatted = mapVisitResponseToVisit(created);
           await upsertCachedVisit(formatted);
-          setVisits((prev) => [formatted, ...prev]);
+          setVisits((prev) => dedupeVisits([formatted, ...prev]));
           return;
         } catch (err) {
           console.warn('Falha na API ao criar visita, enfileirando offline:', err);
@@ -153,7 +170,7 @@ export function VisitProvider({ children }: { children: ReactNode }) {
       };
       await upsertCachedVisit(optimistic);
       await enqueue({ localId, operation: 'CREATE', payload: visitData });
-      setVisits((prev) => [optimistic, ...prev]);
+      setVisits((prev) => dedupeVisits([optimistic, ...prev]));
       await refreshPendingCount();
     },
     [isConnected, refreshPendingCount]
