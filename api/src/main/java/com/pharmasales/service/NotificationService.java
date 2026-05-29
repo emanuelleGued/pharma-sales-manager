@@ -36,4 +36,11 @@ public class NotificationService {
             notificationRepository.save(n);
         });
     }
+
+    public void markAllAsRead(Long userId, UserRole role) {
+        List<com.pharmasales.model.Notification> notifications =
+                notificationRepository.findByUserIdDestinyAndRoleOrderByCreatedAtDesc(userId, role);
+        notifications.forEach(n -> n.setRead(true));
+        notificationRepository.saveAll(notifications);
+    }
 }

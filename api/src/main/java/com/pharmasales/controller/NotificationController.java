@@ -31,4 +31,13 @@ public class NotificationController {
         notificationService.markAsRead(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/read-all")
+    public ResponseEntity<Void> markAllAsRead(
+            @RequestParam Long userId,
+            @RequestParam UserRole role
+    ) {
+        notificationService.markAllAsRead(userId, role);
+        return ResponseEntity.noContent().build();
+    }
 }
