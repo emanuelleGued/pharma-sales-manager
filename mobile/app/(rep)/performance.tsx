@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors } from '../../src/theme/colors';
 import { Header } from '../../src/components/Header';
@@ -6,12 +6,11 @@ import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import DoctorService from '../../src/services/DoctorService';
-import { Visit } from '@/src/context/VisitContext';
-import VisitService from '@/src/services/VisitService';
+import { useVisits } from '@/src/context/VisitContext';
 
 export default function PerformanceScreen() {
   const router = useRouter();
-  const [visits, setVisits] = useState<Visit[]>([]);
+  const { visits } = useVisits();
   const tabBarHeight = useBottomTabBarHeight();
 
   const currentMonth = new Date().getMonth();
@@ -55,19 +54,6 @@ export default function PerformanceScreen() {
   const daysPassed = today.getDate();
   const projectedVisits = daysPassed > 0 ? Math.round((monthProgress / daysPassed) * daysInMonth) : 0;
   const projectedPercent = Math.round((projectedVisits / monthGoal) * 100);
-
-  useEffect(() => {
-    async function loadVisits() {
-      try {
-        const data = await VisitService.getAllVisits();
-        setVisits(data);
-      } catch (error) {
-        console.error('Erro ao carregar visitas:', error);
-      }
-    }
-
-    loadVisits();
-  }, []);
 
   useEffect(() => {
     DoctorService.getAllDoctors()
