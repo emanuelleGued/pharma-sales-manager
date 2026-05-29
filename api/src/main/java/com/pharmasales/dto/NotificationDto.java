@@ -1,5 +1,6 @@
 package com.pharmasales.dto;
 
+import com.pharmasales.model.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,5 @@ public class NotificationDto {
     private String message;
     private LocalDateTime createdAt;
     private boolean read;
+    private NotificationType type;
 }

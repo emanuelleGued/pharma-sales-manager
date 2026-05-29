@@ -38,4 +38,11 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private UserRole role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private NotificationType type;
+
+    @Column(name = "visit_id")
+    private Long visitId;
 }

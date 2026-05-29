@@ -24,7 +24,8 @@ public class NotificationService {
                         n.getTitle(),
                         n.getMessage(),
                         n.getCreatedAt(),
-                        n.isRead()
+                        n.isRead(),
+                        n.getType()
                 ))
                 .collect(Collectors.toList());
     }
