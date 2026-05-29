@@ -2,17 +2,18 @@ import { View, Text, StyleSheet, ScrollView,  Animated, Alert } from 'react-nati
 import VisitCard from '../../src/components/VisitCard';
 import { Header } from '../../src/components/Header';
 import { colors } from '../../src/theme/colors';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useVisits } from '../../src/context/VisitContext';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import DoctorService, { DoctorResponse } from '../../src/services/DoctorService';
+import PerformanceService from '../../src/services/PerformanceService';
 
 export default function RepHomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { visits, deleteVisit } = useVisits();
+  const { visits, deleteVisit, loadVisits } = useVisits();
   const tabBarHeight = useBottomTabBarHeight();
 
   const getStatusLabel = (status: string) => {
@@ -20,7 +21,7 @@ export default function RepHomeScreen() {
       case 'CONCLUIDA': return 'Realizada';
       case 'CANCELADA': return 'Cancelada';
       case 'REAGENDADA': return 'Reagendada';
-      default: return 'Pendente'; // AGENDADA
+      default: return 'Pendente';
     }
   };
   const getLocalDateString = (d: Date) => {
@@ -33,19 +34,25 @@ export default function RepHomeScreen() {
   const todayString = getLocalDateString(new Date());
   const todayVisits = visits.filter(v => v.date === todayString);
 
-  const completedToday = todayVisits.filter(v => v.status === 'CONCLUIDA').length;
-  const progressPercent = (completedToday / 10) * 100;
+  const [summary, setSummary] = useState({ completedVisits: 0, totalVisits: 10 });
+  const progressPercent = summary.totalVisits > 0 ? (summary.completedVisits / summary.totalVisits) * 100 : 0;
   
   const [showToast, setShowToast] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const toastMessage = (params.toastMessage as string) || 'Visita registrada com sucesso!';
   const [doctors, setDoctors] = useState<DoctorResponse[]>([]);
 
-  useEffect(() => {
-    DoctorService.getAllDoctors()
-      .then((data) => setDoctors(data))
-      .catch((err) => console.error('Erro ao buscar médicos para a listagem:', err));
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadVisits();
+      DoctorService.getAllDoctors()
+        .then((data) => setDoctors(data))
+        .catch(() => {});
+      PerformanceService.getPerformanceSummary(1)
+        .then((data) => setSummary(data))
+        .catch(() => {});
+    }, [])
+  );
 
   useEffect(() => {
     if (params.success) { 
@@ -74,7 +81,6 @@ export default function RepHomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Usando o Componente Header de verdade */}
       {showToast && (
         <Animated.View style={[styles.toastWrapper, { opacity: fadeAnim }]}>
           <View style={styles.toast}>
@@ -92,7 +98,7 @@ export default function RepHomeScreen() {
 
       <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}>
         <View style={styles.progressContainer}>
-           <Text style={styles.progressText}>{completedToday} / 10</Text>
+           <Text style={styles.progressText}>{summary.completedVisits} / {summary.totalVisits}</Text>
            <Text style={styles.subText}>Visitas realizadas hoje</Text>
            <View style={styles.badgeMeta}>
               <Text style={styles.badgeText}>{Math.round(progressPercent)}% da meta</Text>
