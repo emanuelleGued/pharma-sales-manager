@@ -17,7 +17,7 @@ public class NotificationService {
 
     public List<NotificationDto> getNotificationsByRole(Long userId, UserRole role) {
         return notificationRepository
-                .findByUserIdAndRoleOrderByCreatedAtDesc(userId, role)
+                .findByUserIdDestinyAndRoleOrderByCreatedAtDesc(userId, role)
                 .stream()
                 .map(n -> new NotificationDto(
                         n.getId(),

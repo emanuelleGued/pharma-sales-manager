@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    List<Notification> findByUserIdAndRoleOrderByCreatedAtDesc(Long userId, UserRole role);
+    List<Notification> findByUserIdDestinyAndRoleOrderByCreatedAtDesc(Long userIdDestiny, UserRole role);
 }

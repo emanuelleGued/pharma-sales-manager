@@ -27,6 +27,7 @@ public class Visit {
 
     private String presentedMaterial;
 
+    @Enumerated(EnumType.STRING)
     private VisitStatus status;
 
     @ManyToOne
