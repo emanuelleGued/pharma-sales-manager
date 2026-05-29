@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors } from '../../src/theme/colors';
 import { Header } from '../../src/components/Header';
@@ -11,7 +11,7 @@ import PerformanceService from '@/src/services/PerformanceService';
 
 export default function PerformanceScreen() {
   const router = useRouter();
-  const [visits, setVisits] = useState<Visit[]>([]);
+  const { visits } = useVisits();
   const tabBarHeight = useBottomTabBarHeight();
 
   const currentMonth = new Date().getMonth();
