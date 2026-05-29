@@ -20,8 +20,13 @@ public class PerformanceService {
 
     public PerformanceSummaryDTO getPerformanceSummary(Long repId) {
         LocalDate today = LocalDate.now();
-        Long completedVisits = visitRepository.countVisitsByRepIdAndDateAndStatus(repId, today, VisitStatus.CONCLUIDA);
-        Long totalVisits = visitRepository.countTotalVisitsByRepIdAndDate(repId, today);
+        LocalDate startOfMonth = today.withDayOfMonth(1);
+        LocalDate endOfMonth = YearMonth.from(today).atEndOfMonth();
+
+        Long completedVisits = visitRepository.countVisitsByRepIdAndPeriodAndStatus(
+                repId, startOfMonth, endOfMonth, VisitStatus.CONCLUIDA);
+        Long totalVisits = visitRepository.countTotalVisitsByRepIdAndPeriod(
+                repId, startOfMonth, endOfMonth);
         return new PerformanceSummaryDTO(completedVisits, totalVisits);
     }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors } from '../../src/theme/colors';
 import { Header } from '../../src/components/Header';
@@ -6,13 +6,13 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import DoctorService from '../../src/services/DoctorService';
-import { Visit } from '@/src/context/VisitContext';
+import { Visit, useVisits } from '@/src/context/VisitContext';
 import VisitService from '@/src/services/VisitService';
 import PerformanceService from '@/src/services/PerformanceService';
 
 export default function PerformanceScreen() {
   const router = useRouter();
-  const { visits } = useVisits();
+  const [visits, setVisits ] = useState<Visit[]>([]);
   const tabBarHeight = useBottomTabBarHeight();
 
   const currentMonth = new Date().getMonth();
@@ -59,11 +59,16 @@ export default function PerformanceScreen() {
           const data = await VisitService.getAllVisits();
           setVisits(data);
         } catch (error) {
+          console.warn('Erro ao carregar visitas em performance:', error);
         }
       }
       loadVisits();
-      PerformanceService.getPerformanceMetrics(1).then(setMetrics).catch(() => {});
-      PerformanceService.getPerformanceSummary(1).then(setSummary).catch(() => {});
+      PerformanceService.getPerformanceMetrics(1)
+        .then(setMetrics)
+        .catch((err) => console.warn('Erro métricas:', err));
+      PerformanceService.getPerformanceSummary(1)
+        .then(setSummary)
+        .catch((err) => console.warn('Erro summary:', err));
     }, [])
   );
 
