@@ -5,7 +5,7 @@ export interface PerformanceSummaryDTO {
   totalVisits: number;
 }
 
-export interface PerformanceStatsDTO {
+export interface PerformanceMetricsDTO {
   uniqueDoctorsVisited: number;
   targetDoctors: number;
 }
@@ -16,8 +16,8 @@ class PerformanceService {
     return response.data;
   }
 
-  async getStats(repId: number): Promise<PerformanceStatsDTO> {
-    const response = await api.get(`/api/performance/stats?repId=${repId}`);
+  async getMetrics(repId: number): Promise<PerformanceMetricsDTO> {
+    const response = await api.get(`/api/performance/metrics?repId=${repId}`);
     return response.data;
   }
 
@@ -25,8 +25,8 @@ class PerformanceService {
     return this.getSummary(repId);
   }
 
-  async getPerformanceStats(repId: number): Promise<PerformanceStatsDTO> {
-    return this.getStats(repId);
+  async getPerformanceMetrics(repId: number): Promise<PerformanceMetricsDTO> {
+    return this.getMetrics(repId);
   }
 }
 

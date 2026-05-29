@@ -1,6 +1,6 @@
 package com.pharmasales.controller;
 
-import com.pharmasales.dto.PerformanceStatsDTO;
+import com.pharmasales.dto.PerformanceMetricsDTO;
 import com.pharmasales.dto.PerformanceSummaryDTO;
 import com.pharmasales.service.PerformanceService;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +24,8 @@ public class PerformanceController {
         return ResponseEntity.ok(performanceService.getPerformanceSummary(repId));
     }
 
-    @GetMapping("/stats")
-    public ResponseEntity<PerformanceStatsDTO> getStats(@RequestParam("repId") Long repId) {
-        return ResponseEntity.ok(performanceService.getPerformanceStats(repId));
+    @GetMapping("/metrics")
+    public ResponseEntity<PerformanceMetricsDTO> getMetrics(@RequestParam("repId") Long repId) {
+        return ResponseEntity.ok(performanceService.getPerformanceMetrics(repId));
     }
 }

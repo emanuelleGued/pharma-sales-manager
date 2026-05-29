@@ -1,6 +1,6 @@
 package com.pharmasales.service;
 
-import com.pharmasales.dto.PerformanceStatsDTO;
+import com.pharmasales.dto.PerformanceMetricsDTO;
 import com.pharmasales.dto.PerformanceSummaryDTO;
 import com.pharmasales.model.VisitStatus;
 import com.pharmasales.repository.VisitRepository;
@@ -25,14 +25,15 @@ public class PerformanceService {
         return new PerformanceSummaryDTO(completedVisits, totalVisits);
     }
 
-    public PerformanceStatsDTO getPerformanceStats(Long repId) {
+    public PerformanceMetricsDTO getPerformanceMetrics(Long repId) {
         LocalDate today = LocalDate.now();
         LocalDate startOfMonth = today.withDayOfMonth(1);
         LocalDate endOfMonth = YearMonth.from(today).atEndOfMonth();
-        
-        Long uniqueDoctorsVisited = visitRepository.countUniqueDoctorsVisitedByRepIdAndPeriod(repId, startOfMonth, endOfMonth, VisitStatus.CONCLUIDA);
+
+        Long uniqueDoctorsVisited = visitRepository.countUniqueDoctorsVisitedByRepIdAndPeriod(repId, startOfMonth,
+                endOfMonth, VisitStatus.CONCLUIDA);
         Long targetDoctors = visitRepository.countTargetDoctorsByRepIdAndPeriod(repId, startOfMonth, endOfMonth);
-        
-        return new PerformanceStatsDTO(uniqueDoctorsVisited, targetDoctors);
+
+        return new PerformanceMetricsDTO(uniqueDoctorsVisited, targetDoctors);
     }
 }

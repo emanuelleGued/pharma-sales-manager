@@ -17,10 +17,10 @@ export default function PerformanceScreen() {
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
-  const [stats, setStats] = useState({ uniqueDoctorsVisited: 0, targetDoctors: 1 });
+  const [metrics, setMetrics] = useState({ uniqueDoctorsVisited: 0, targetDoctors: 1 });
   const [summary, setSummary] = useState({ completedVisits: 0, totalVisits: 200 });
 
-  const doctorBasePercent = stats.targetDoctors > 0 ? (stats.uniqueDoctorsVisited / stats.targetDoctors) * 100 : 0;
+  const doctorBasePercent = metrics.targetDoctors > 0 ? (metrics.uniqueDoctorsVisited / metrics.targetDoctors) * 100 : 0;
 
   const weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
   const today = new Date();
@@ -62,7 +62,7 @@ export default function PerformanceScreen() {
         }
       }
       loadVisits();
-      PerformanceService.getPerformanceStats(1).then(setStats).catch(() => {});
+      PerformanceService.getPerformanceMetrics(1).then(setMetrics).catch(() => {});
       PerformanceService.getPerformanceSummary(1).then(setSummary).catch(() => {});
     }, [])
   );
@@ -79,7 +79,7 @@ export default function PerformanceScreen() {
            <View style={styles.baseTop}>
              <View style={styles.baseInfo}>
                <Text style={styles.baseSubtitle}>Base de Médicos</Text>
-               <Text style={styles.baseTitle}>{stats.uniqueDoctorsVisited} <Text style={styles.baseTitleSmall}>/ {stats.targetDoctors}</Text></Text>
+               <Text style={styles.baseTitle}>{metrics.uniqueDoctorsVisited} <Text style={styles.baseTitleSmall}>/ {metrics.targetDoctors}</Text></Text>
                <Text style={styles.baseDesc}>Doutores visitados este mês</Text>
              </View>
              <View style={styles.avatarContainer}>
