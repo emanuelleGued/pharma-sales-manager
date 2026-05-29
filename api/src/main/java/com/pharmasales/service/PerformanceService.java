@@ -3,6 +3,7 @@ package com.pharmasales.service;
 import com.pharmasales.dto.PerformanceMetricsDTO;
 import com.pharmasales.dto.PerformanceSummaryDTO;
 import com.pharmasales.model.VisitStatus;
+import com.pharmasales.repository.DoctorRepository;
 import com.pharmasales.repository.VisitRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +14,11 @@ import java.time.YearMonth;
 public class PerformanceService {
 
     private final VisitRepository visitRepository;
+    private final DoctorRepository doctorRepository;
 
-    public PerformanceService(VisitRepository visitRepository) {
+    public PerformanceService(VisitRepository visitRepository, DoctorRepository doctorRepository) {
         this.visitRepository = visitRepository;
+        this.doctorRepository = doctorRepository;
     }
 
     public PerformanceSummaryDTO getPerformanceSummary(Long repId) {
@@ -37,7 +40,7 @@ public class PerformanceService {
 
         Long uniqueDoctorsVisited = visitRepository.countUniqueDoctorsVisitedByRepIdAndPeriod(repId, startOfMonth,
                 endOfMonth, VisitStatus.CONCLUIDA);
-        Long targetDoctors = visitRepository.countTargetDoctorsByRepIdAndPeriod(repId, startOfMonth, endOfMonth);
+        Long targetDoctors = doctorRepository.count();
 
         return new PerformanceMetricsDTO(uniqueDoctorsVisited, targetDoctors);
     }

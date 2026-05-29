@@ -10,6 +10,9 @@ import { Visit, useVisits } from '@/src/context/VisitContext';
 import VisitService from '@/src/services/VisitService';
 import PerformanceService from '@/src/services/PerformanceService';
 
+const DAILY_GOAL = 10;
+const MONTHLY_GOAL = 20;
+
 export default function PerformanceScreen() {
   const router = useRouter();
   const [visits, setVisits ] = useState<Visit[]>([]);
@@ -17,8 +20,8 @@ export default function PerformanceScreen() {
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
-  const [metrics, setMetrics] = useState({ uniqueDoctorsVisited: 0, targetDoctors: 1 });
-  const [summary, setSummary] = useState({ completedVisits: 0, totalVisits: 200 });
+  const [metrics, setMetrics] = useState({ uniqueDoctorsVisited: 0, targetDoctors: 0 });
+  const [summary, setSummary] = useState({ completedVisits: 0, totalVisits: 0 });
 
   const doctorBasePercent = metrics.targetDoctors > 0 ? (metrics.uniqueDoctorsVisited / metrics.targetDoctors) * 100 : 0;
 
@@ -41,9 +44,9 @@ export default function PerformanceScreen() {
     }
   });
 
-  const maxWeeklyVisits = Math.max(...weeklyVisits, 12);
+  const maxWeeklyVisits = Math.max(...weeklyVisits, DAILY_GOAL);
 
-  const monthGoal = summary.totalVisits;
+  const monthGoal = MONTHLY_GOAL;
   const monthProgress = summary.completedVisits;
   const monthPercent = monthGoal > 0 ? (monthProgress / monthGoal) * 100 : 0;
 
