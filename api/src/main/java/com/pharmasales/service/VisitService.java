@@ -37,7 +37,8 @@ public class VisitService {
                 visit.getDoctor().getId(),
                 visit.getDoctor().getName(),
                 visit.getUser().getId(),
-                visit.getTime()
+                visit.getTime(),
+                visit.getPresentedMaterial()
         );
     }
 
@@ -139,7 +140,8 @@ public class VisitService {
                 doctor.getId(),
                 doctor.getName(),
                 user.getId(),
-                savedVisit.getTime()
+                savedVisit.getTime(),
+                savedVisit.getPresentedMaterial()
         );
     }
 
