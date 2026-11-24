@@ -15,6 +15,8 @@ public class CreateVisitRequest {
 
     private String observation;
 
+    private String presentedMaterial;
+
     @NotNull(message = "O status da visita é obrigatório")
     private VisitStatus status;
 
