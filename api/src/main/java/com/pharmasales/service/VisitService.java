@@ -114,6 +114,7 @@ public class VisitService {
         visit.setTime(request.getTime());
         visit.setObservation(request.getObservation());
         visit.setStatus(request.getStatus());
+        visit.setPresentedMaterial(request.getPresentedMaterial());
         visit.setDoctor(doctor);
         visit.setUser(user);
 
@@ -195,6 +196,7 @@ public class VisitService {
         visit.setStatus(request.getStatus());
         visit.setDoctor(doctor);
         visit.setUser(user);
+        visit.setPresentedMaterial(request.getPresentedMaterial());
 
         Visit updatedVisit = visitRepository.save(visit);
 
